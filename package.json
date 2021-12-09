@@ -1,0 +1,83 @@
+{
+  "name": "kstone-dashboard",
+  "version": "0.0.1",
+  "private": true,
+  "dependencies": {
+    "@testing-library/jest-dom": "^5.11.4",
+    "@testing-library/react": "^11.1.0",
+    "@testing-library/user-event": "^12.1.10",
+    "@types/jest": "^26.0.15",
+    "@types/js-yaml": "^4.0.4",
+    "@types/lodash": "^4.14.176",
+    "@types/node": "^12.0.0",
+    "@types/react": "^17.0.0",
+    "@types/react-dom": "^17.0.0",
+    "@types/react-router-dom": "^5.3.2",
+    "@types/validator": "^13.6.6",
+    "antd": "^4.17.0-alpha.9",
+    "axios": "^0.24.0",
+    "codemirror": "^5.63.3",
+    "final-form": "^4.20.4",
+    "history": "5",
+    "http-proxy-middleware": "^2.0.1",
+    "js-base64": "^3.7.2",
+    "js-yaml": "^4.1.0",
+    "lodash": "^4.17.21",
+    "monaco-editor": "^0.29.1",
+    "monaco-editor-webpack-plugin": "^5.0.0",
+    "prop-types": "^15.7.2",
+    "react": "^17.0.2",
+    "react-codemirror2": "^7.2.1",
+    "react-dom": "^17.0.2",
+    "react-final-form-hooks": "^2.0.2",
+    "react-monaco-editor": "^0.46.0",
+    "react-router-dom": "6",
+    "react-scripts": "4.0.3",
+    "standard-version": "^9.3.2",
+    "typescript": "^4.1.2",
+    "validator": "^13.7.0",
+    "web-vitals": "^1.0.1"
+  },
+  "scripts": {
+    "start": "react-app-rewired start",
+    "build": "react-app-rewired build",
+    "test": "react-app-rewired test",
+    "eject": "react-app-rewired eject",
+    "release": "standard-version"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^5.4.0",
+    "@typescript-eslint/parser": "^5.4.0",
+    "babel-eslint": "^10.1.0",
+    "cypress": "^9.0.0",
+    "eslint": "^7.11.0",
+    "eslint-config-react-app": "^6.0.0",
+    "eslint-loader": "^4.0.2",
+    "eslint-plugin-flowtype": "^8.0.3",
+    "eslint-plugin-import": "^2.25.3",
+    "eslint-plugin-jsx-a11y": "^6.5.1",
+    "eslint-plugin-react": "^7.27.1",
+    "eslint-plugin-react-hooks": "^4.3.0",
+    "lint-staged": "^12.1.2",
+    "react-app-rewired": "^2.1.8"
+  },
+  "license": "Apache-2.0"
+}
