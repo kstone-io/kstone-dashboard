@@ -35,15 +35,18 @@ const { SubMenu } = Menu;
 const Layout = ({ menu }: { menu: any }): JSX.Element => {
   const [collapsed, setCollapsed] = useState(false);
   const { i18n } = useTranslation();
-  const lang = i18n.language;
+  const lang = localStorage.getItem("locale");
 
   const handleMenuClick = (e: any) => {
     if (e.key === "1") {
       i18n.changeLanguage("zh-CN");
+      localStorage.setItem("locale", "zh-CN");
     }
     if (e.key === "2") {
       i18n.changeLanguage("en-US");
+      localStorage.setItem("locale", "en-US");
     }
+    window.location.reload();
   };
   const menus = (
     <Menu onClick={handleMenuClick}>
