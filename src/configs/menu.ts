@@ -16,52 +16,51 @@
  * specific language governing permissions and limitations under the License.
  */
 
-import { AppMenu } from '../models/menu';
+import { AppMenu } from "../models/menu";
+import i18n from "src/languages/i18n";
 
 /**
  * 定义导航菜单
  */
 export const menu: AppMenu = {
-  title: 'kstone',
+  title: "kstone",
   items: [
     {
-      key: 'clusterManager',
-      title: '集群管理',
-      items:
-      [
+      key: "clusterManager",
+      title: i18n.t("ClusterManagement"),
+      items: [
         {
-          key: 'addCluster',
-          route: '/cluster/add',
-          title: '关联集群'
+          key: "addCluster",
+          route: "/cluster/add",
+          title: i18n.t("AssociatedCluster"),
         },
         {
-          key: 'cluster',
-          route: '/cluster',
-          title: '集群管理'
+          key: "cluster",
+          route: "/cluster",
+          title: i18n.t("ClusterManagement"),
         },
-      ]
+      ],
     },
     {
-      title: '运维中心',
-      key: 'operation',
-      items:
-      [
+      title: i18n.t("OperationCenter"),
+      key: "operation",
+      items: [
         {
-          key: 'visualization',
-          route: '/visualization',
-          title: '可视化工具',
+          key: "visualization",
+          route: "/visualization",
+          title: i18n.t("VisualizationTool"),
         },
         {
-          key: 'monitor',
-          route: '/monitor',
-          title: '监控和巡检'
+          key: "monitor",
+          route: "/monitor",
+          title: i18n.t("MonitorAndInspection"),
         },
         {
-          key: 'backup',
-          route: '/backup',
-          title: '备份管理'
-        }
-      ]
+          key: "backup",
+          route: "/backup",
+          title: i18n.t("BackupManagement"),
+        },
+      ],
     },
-  ]
+  ],
 };
