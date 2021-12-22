@@ -16,21 +16,29 @@
  * specific language governing permissions and limitations under the License.
  */
 
-import { Modal, Form, Card, Input, Switch, Spin, InputNumber } from "antd";
-import { useEffect, useState } from "react";
-import * as _ from "lodash";
-import http from "src/utils/http";
-import { encode, decode } from "js-base64";
-import { useTranslation } from "react-i18next";
+import { Modal, Form, Card, Input, Switch, Spin, InputNumber } from 'antd';
+import { useEffect, useState } from 'react';
+import * as _ from 'lodash';
+import http from 'src/utils/http';
+import { encode, decode } from 'js-base64';
+import { useTranslation } from 'react-i18next';
 // form style
 const formItemLayout = {
   labelCol: { span: 10 },
   wrapperCol: { span: 12 },
 };
 
-const FeatureGatesKey = "featureGates";
+const FeatureGatesKey = 'featureGates';
 // page to edit feature gates
-export const ClusterFeatureModal = ({ visible, data, close }: { visible: any; data: any; close: any }): JSX.Element => {
+export const ClusterFeatureModal = ({
+  visible,
+  data,
+  close,
+}: {
+  visible: any;
+  data: any;
+  close: any;
+}): JSX.Element => {
   const [isLoading, setIsLoading] = useState(false);
   const [monitor, setMonitor] = useState(false);
   const [consistency, setConsistency] = useState(false);
@@ -40,9 +48,9 @@ export const ClusterFeatureModal = ({ visible, data, close }: { visible: any; da
   const [backupIntervalInSecond, setBackupIntervalInSecond] = useState(3600);
   const [maxBackups, setMaxBackups] = useState(72);
   const [timeoutInSecond, setTimeoutInSecond] = useState(600);
-  const [secretId, setSecretId] = useState("");
-  const [secretKey, setSecretKey] = useState("");
-  const [path, setPath] = useState("");
+  const [secretId, setSecretId] = useState('');
+  const [secretKey, setSecretKey] = useState('');
+  const [path, setPath] = useState('');
   const { t } = useTranslation();
 
   // load info
@@ -50,20 +58,24 @@ export const ClusterFeatureModal = ({ visible, data, close }: { visible: any; da
     (async () => {
       if (data?.metadata?.labels) {
         setIsLoading(true);
-        setMonitor(data.metadata.labels.monitor === "true");
-        setConsistency(data.metadata.labels.consistency === "true");
-        setHealthy(data.metadata.labels.healthy === "true");
-        setRequest(data.metadata.labels.request === "true");
-        setBackup(data.metadata.labels.backup === "true");
+        setMonitor(data.metadata.labels.monitor === 'true');
+        setConsistency(data.metadata.labels.consistency === 'true');
+        setHealthy(data.metadata.labels.healthy === 'true');
+        setRequest(data.metadata.labels.request === 'true');
+        setBackup(data.metadata.labels.backup === 'true');
 
-        if (data.metadata.labels.backup === "true") {
-          const backupValue = JSON.parse(data?.metadata?.annotations?.backup ?? "{}");
+        if (data.metadata.labels.backup === 'true') {
+          const backupValue = JSON.parse(
+            data?.metadata?.annotations?.backup ?? '{}',
+          );
           const res = await http.get(`/apis/secrets/cos-${data.metadata.name}`);
-          setBackupIntervalInSecond(backupValue?.backupPolicy?.backupIntervalInSecond);
+          setBackupIntervalInSecond(
+            backupValue?.backupPolicy?.backupIntervalInSecond,
+          );
           setMaxBackups(backupValue?.backupPolicy?.maxBackups);
           setTimeoutInSecond(backupValue?.backupPolicy?.timeoutInSecond);
-          setSecretId(decode(res?.data?.data["secret-id"] ?? ""));
-          setSecretKey(decode(res?.data?.data["secret-key"] ?? ""));
+          setSecretId(decode(res?.data?.data['secret-id'] ?? ''));
+          setSecretKey(decode(res?.data?.data['secret-key'] ?? ''));
           setPath(backupValue?.cos?.path);
         }
         setIsLoading(false);
@@ -115,74 +127,134 @@ export const ClusterFeatureModal = ({ visible, data, close }: { visible: any; da
       return;
     }
     const model = {
-      apiVersion: "v1",
+      apiVersion: 'v1',
       data: {
-        "secret-id": encode(values.secretId),
-        "secret-key": encode(values.secretKey),
+        'secret-id': encode(values.secretId),
+        'secret-key': encode(values.secretKey),
       },
-      kind: "Secret",
+      kind: 'Secret',
       metadata: {
         name: `cos-${data.metadata.name}`,
-        namespace: "kstone",
+        namespace: 'kstone',
       },
-      type: "Opaque",
+      type: 'Opaque',
     };
     http
       .get(`/apis/secrets/cos-${data.metadata.name}`)
-      .then(resp => {
+      .then((resp) => {
         if (resp.data.code === 404) {
-          http.post("/apis/secrets", model);
+          http.post('/apis/secrets', model);
         } else {
           http.put(`/apis/secrets/cos-${data.metadata.name}`, model);
         }
       })
       .catch(() => {
-        http.post("/apis/secrets", model);
+        http.post('/apis/secrets', model);
       });
   };
 
   return (
-    <Modal visible={visible} title={t("ClusterFeature")} onCancel={close} onOk={onFinish}>
+    <Modal
+      visible={visible}
+      title={t('ClusterFeature')}
+      onCancel={close}
+      onOk={onFinish}
+    >
       <Spin spinning={isLoading}>
-        <Card title={t("FeatureGates")}>
+        <Card title={t('FeatureGates')}>
           <Form name="form" layout="inline">
             <Form.Item label="Monitor">
-              <Switch key="Monitor" checked={monitor} onChange={(value: boolean) => setMonitor(value)} />
+              <Switch
+                key="Monitor"
+                checked={monitor}
+                onChange={(value: boolean) => setMonitor(value)}
+              />
             </Form.Item>
             <Form.Item label="Consistency">
-              <Switch key="Consistency" checked={consistency} onChange={(value: boolean) => setConsistency(value)} />
+              <Switch
+                key="Consistency"
+                checked={consistency}
+                onChange={(value: boolean) => setConsistency(value)}
+              />
             </Form.Item>
             <Form.Item label="Healthy">
-              <Switch key="Healthy" checked={healthy} onChange={(value: boolean) => setHealthy(value)} />
+              <Switch
+                key="Healthy"
+                checked={healthy}
+                onChange={(value: boolean) => setHealthy(value)}
+              />
             </Form.Item>
             <Form.Item label="Request">
-              <Switch key="Request" checked={request} onChange={(value: boolean) => setRequest(value)} />
+              <Switch
+                key="Request"
+                checked={request}
+                onChange={(value: boolean) => setRequest(value)}
+              />
             </Form.Item>
             <Form.Item label="Backup">
-              <Switch key="Backup" checked={backup} onChange={(value: boolean) => setBackup(value)} />
+              <Switch
+                key="Backup"
+                checked={backup}
+                onChange={(value: boolean) => setBackup(value)}
+              />
             </Form.Item>
           </Form>
         </Card>
         {backup ? (
-          <Card title={t("BackupParameterSettings")} style={{ marginTop: "10px" }}>
+          <Card
+            title={t('BackupParameterSettings')}
+            style={{ marginTop: '10px' }}
+          >
             <Form name="backup" {...formItemLayout}>
               <Form.Item label="BackupIntervalInSecond" required>
-                <InputNumber min={0} value={backupIntervalInSecond} onChange={(e: any) => setBackupIntervalInSecond(e.target.value)} />
+                <InputNumber
+                  min={0}
+                  value={backupIntervalInSecond}
+                  onChange={(e: any) =>
+                    setBackupIntervalInSecond(e.target.value)
+                  }
+                />
               </Form.Item>
               <Form.Item label="MaxBackups" required>
-                <InputNumber min={0} value={maxBackups} onChange={(e: any) => setMaxBackups(e.target.value)} />
+                <InputNumber
+                  min={0}
+                  value={maxBackups}
+                  onChange={(e: any) => setMaxBackups(e.target.value)}
+                />
               </Form.Item>
               <Form.Item label="TimeoutInSecond" required>
-                <InputNumber min={0} value={timeoutInSecond} onChange={(e: any) => setTimeoutInSecond(e.target.value)} />
+                <InputNumber
+                  min={0}
+                  value={timeoutInSecond}
+                  onChange={(e: any) => setTimeoutInSecond(e.target.value)}
+                />
               </Form.Item>
               <Form.Item label="SecretId" required>
-                <Input placeholder={t("PleaseInput")} autoComplete="off" spellCheck={false} value={secretId} onChange={(e: any) => setSecretId(e.target.value)} />
+                <Input
+                  placeholder={t('PleaseInput')}
+                  autoComplete="off"
+                  spellCheck={false}
+                  value={secretId}
+                  onChange={(e: any) => setSecretId(e.target.value)}
+                />
               </Form.Item>
               <Form.Item label="SecretKey" required>
-                <Input placeholder={t("PleaseInput")} autoComplete="off" spellCheck={false} value={secretKey} onChange={(e: any) => setSecretKey(e.target.value)} />
+                <Input
+                  placeholder={t('PleaseInput')}
+                  autoComplete="off"
+                  spellCheck={false}
+                  value={secretKey}
+                  onChange={(e: any) => setSecretKey(e.target.value)}
+                />
               </Form.Item>
               <Form.Item label="Path" required>
-                <Input placeholder={t("PleaseInput")} autoComplete="off" spellCheck={false} value={path} onChange={(e: any) => setPath(e.target.value)} />
+                <Input
+                  placeholder={t('PleaseInput')}
+                  autoComplete="off"
+                  spellCheck={false}
+                  value={path}
+                  onChange={(e: any) => setPath(e.target.value)}
+                />
               </Form.Item>
             </Form>
           </Card>

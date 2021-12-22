@@ -16,18 +16,25 @@
  * specific language governing permissions and limitations under the License.
  */
 
-import React, { useState } from "react";
-import { Outlet, Link } from "react-router-dom";
-import { Button, ConfigProvider, Dropdown, Layout as AntdLayout, Menu, Select } from "antd";
-import { ClusterOutlined } from "@ant-design/icons";
-import logo from "../../src/logo.png";
+import React, { useState } from 'react';
+import { Outlet, Link } from 'react-router-dom';
+import {
+  Button,
+  ConfigProvider,
+  Dropdown,
+  Layout as AntdLayout,
+  Menu,
+  Select,
+} from 'antd';
+import { ClusterOutlined } from '@ant-design/icons';
+import logo from '../../src/logo.png';
 
-import "./Layout.css";
-import DownOutlined from "@ant-design/icons/lib/icons/DownOutlined";
-import { useTranslation } from "react-i18next";
-import zhCN from "antd/lib/locale/zh_CN";
+import './Layout.css';
+import DownOutlined from '@ant-design/icons/lib/icons/DownOutlined';
+import { useTranslation } from 'react-i18next';
+import zhCN from 'antd/lib/locale/zh_CN';
 
-import enUS from "antd/lib/locale/en_US";
+import enUS from 'antd/lib/locale/en_US';
 
 const { Header, Content, Sider } = AntdLayout;
 const { SubMenu } = Menu;
@@ -35,15 +42,18 @@ const { SubMenu } = Menu;
 const Layout = ({ menu }: { menu: any }): JSX.Element => {
   const [collapsed, setCollapsed] = useState(false);
   const { i18n } = useTranslation();
-  const lang = i18n.language;
+  const lang = localStorage.getItem('locale');
 
   const handleMenuClick = (e: any) => {
-    if (e.key === "1") {
-      i18n.changeLanguage("zh-CN");
+    if (e.key === '1') {
+      i18n.changeLanguage('zh-CN');
+      localStorage.setItem('locale', 'zh-CN');
     }
-    if (e.key === "2") {
-      i18n.changeLanguage("en-US");
+    if (e.key === '2') {
+      i18n.changeLanguage('en-US');
+      localStorage.setItem('locale', 'en-US');
     }
+    window.location.reload();
   };
   const menus = (
     <Menu onClick={handleMenuClick}>
@@ -52,27 +62,32 @@ const Layout = ({ menu }: { menu: any }): JSX.Element => {
     </Menu>
   );
   return (
-    <AntdLayout style={{ height: "100%" }}>
-      <Header style={{ position: "fixed", zIndex: 1, width: "100%", padding: 0 }}>
+    <AntdLayout style={{ height: '100%' }}>
+      <Header
+        style={{ position: 'fixed', zIndex: 1, width: '100%', padding: 0 }}
+      >
         <div className="logo">
           <img src={logo} alt="logo" width="120px" />
-          <Dropdown overlay={menus} trigger={["click", "hover"]}>
-            <a className="ant-dropdown-link" onClick={e => e.preventDefault()}>
-              {lang === "zh-CN" ? "中文" : "English"} <DownOutlined />
+          <Dropdown overlay={menus} trigger={['click', 'hover']}>
+            <a
+              className="ant-dropdown-link"
+              onClick={(e) => e.preventDefault()}
+            >
+              {lang === 'zh-CN' ? '中文' : 'English'} <DownOutlined />
             </a>
           </Dropdown>
         </div>
       </Header>
-      <Content style={{ marginTop: "50px", height: "100%" }}>
-        <AntdLayout style={{ minHeight: "100%" }}>
+      <Content style={{ marginTop: '50px', height: '100%' }}>
+        <AntdLayout style={{ minHeight: '100%' }}>
           <Sider
             collapsible
             collapsed={collapsed}
             onCollapse={() => setCollapsed(!collapsed)}
             style={{
-              overflow: "auto",
-              height: "100vh",
-              position: "fixed",
+              overflow: 'auto',
+              height: '100vh',
+              position: 'fixed',
               left: 0,
             }}
           >
@@ -80,13 +95,17 @@ const Layout = ({ menu }: { menu: any }): JSX.Element => {
               mode="inline"
               // defaultSelectedKeys={['cluster']}
               defaultOpenKeys={menu.items.map((item: any) => item.key)}
-              style={{ height: "100%" }}
+              style={{ height: '100%' }}
               theme="dark"
             >
               {menu.items.map((item: any) => {
-                if ("items" in item) {
+                if ('items' in item) {
                   return (
-                    <SubMenu key={item.key} icon={<ClusterOutlined />} title={item.title}>
+                    <SubMenu
+                      key={item.key}
+                      icon={<ClusterOutlined />}
+                      title={item.title}
+                    >
                       {item.items.map((subItem: any) => {
                         return (
                           <Menu.Item key={subItem.key}>
@@ -110,13 +129,13 @@ const Layout = ({ menu }: { menu: any }): JSX.Element => {
             className="site-layout"
             style={(() => {
               if (collapsed) {
-                return { marginLeft: "80px", minHeight: "100%" };
+                return { marginLeft: '80px', minHeight: '100%' };
               } else {
-                return { marginLeft: "200px", minHeight: "100%" };
+                return { marginLeft: '200px', minHeight: '100%' };
               }
             })()}
           >
-            <ConfigProvider locale={lang === "zh-CN" ? zhCN : enUS}>
+            <ConfigProvider locale={lang === 'zh-CN' ? zhCN : enUS}>
               <Outlet></Outlet>
             </ConfigProvider>
           </AntdLayout>

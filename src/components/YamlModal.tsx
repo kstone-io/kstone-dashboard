@@ -16,13 +16,21 @@
  * specific language governing permissions and limitations under the License.
  */
 
-import { Modal } from "antd";
-import * as yaml from "js-yaml";
-import { useTranslation } from "react-i18next";
+import { Modal } from 'antd';
+import * as yaml from 'js-yaml';
+import { useTranslation } from 'react-i18next';
 
-import { YamlEditorPanel } from "./CodeMirrorEditor";
+import { YamlEditorPanel } from './CodeMirrorEditor';
 
-export const YamlModal = ({ visible, data, onclose }: { visible: any; data: any; onclose: any }): JSX.Element => {
+export const YamlModal = ({
+  visible,
+  data,
+  onclose,
+}: {
+  visible: any;
+  data: any;
+  onclose: any;
+}): JSX.Element => {
   const { t } = useTranslation();
 
   const getNodeMaster = () => {
@@ -30,8 +38,13 @@ export const YamlModal = ({ visible, data, onclose }: { visible: any; data: any;
   };
 
   return (
-    <Modal width={1000} visible={visible} title={t("ViewYaml")} onCancel={onclose}>
-      <div style={{ height: "600px", overflow: "auto" }}>
+    <Modal
+      width={1000}
+      visible={visible}
+      title={t('ViewYaml')}
+      onCancel={onclose}
+    >
+      <div style={{ height: '600px', overflow: 'auto' }}>
         <YamlEditorPanel readOnly={true} config={getNodeMaster()} />
       </div>
     </Modal>

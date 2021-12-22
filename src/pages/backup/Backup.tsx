@@ -16,28 +16,28 @@
  * specific language governing permissions and limitations under the License.
  */
 
-import { useState, useEffect, useCallback } from "react";
-import { Layout, Typography, Select, Table, Empty } from "antd";
-import http from "src/utils/http";
-import { FormatBytes } from "src/utils/common";
-import { useTranslation } from "react-i18next";
+import { useState, useEffect, useCallback } from 'react';
+import { Layout, Typography, Select, Table, Empty } from 'antd';
+import http from 'src/utils/http';
+import { FormatBytes } from 'src/utils/common';
+import { useTranslation } from 'react-i18next';
 
 const { Text } = Typography;
 const { Header, Content } = Layout;
 
-const BackupAnnotationKey = "backup";
+const BackupAnnotationKey = 'backup';
 
 export function Backup(): JSX.Element {
   const [clusterList, setClusterList] = useState([]);
-  const [clusterName, setClusterName] = useState("");
+  const [clusterName, setClusterName] = useState('');
   const [backupInfo, setBackupInfo] = useState([] as any);
   const [isLoading, setIsLoading] = useState(false);
   const { t } = useTranslation();
 
   const columnList = [
     {
-      key: "Key",
-      header: t("FileName"),
+      key: 'Key',
+      header: t('FileName'),
       width: 200,
       render: (item: any) => (
         <>
@@ -46,8 +46,8 @@ export function Backup(): JSX.Element {
       ),
     },
     {
-      key: "StorageClass",
-      header: t("StorageLevel"),
+      key: 'StorageClass',
+      header: t('StorageLevel'),
       width: 100,
       render: (item: any) => (
         <>
@@ -56,8 +56,8 @@ export function Backup(): JSX.Element {
       ),
     },
     {
-      key: "LastModified",
-      header: t("LastUpdateTime"),
+      key: 'LastModified',
+      header: t('LastUpdateTime'),
       width: 100,
       render: (item: any) => (
         <>
@@ -66,8 +66,8 @@ export function Backup(): JSX.Element {
       ),
     },
     {
-      key: "Size",
-      header: t("FileSize"),
+      key: 'Size',
+      header: t('FileSize'),
       width: 100,
       render: (item: any) => (
         <>
@@ -79,7 +79,7 @@ export function Backup(): JSX.Element {
 
   const getEtcdCluster = useCallback(async () => {
     setIsLoading(true);
-    http.get("/apis/etcdclusters").then(resp => {
+    http.get('/apis/etcdclusters').then((resp) => {
       if (resp.data.items.length) {
         setClusterList(resp.data.items);
         setClusterName(resp.data.items[0].metadata.name);
@@ -108,7 +108,7 @@ export function Backup(): JSX.Element {
         if (cluster.metadata.annotations[BackupAnnotationKey] === undefined) {
           setBackupInfo(undefined);
         } else {
-          http.get(`/apis/backup/${clusterName}`).then(resp => {
+          http.get(`/apis/backup/${clusterName}`).then((resp) => {
             let result = resp.data;
             if (result === undefined) {
               result = [];
@@ -124,31 +124,54 @@ export function Backup(): JSX.Element {
   return (
     <Layout>
       <Header className="site-layout-background" style={{ padding: 0 }}>
-        <Text strong style={{ float: "left", marginLeft: "15px", marginRight: "15px" }}>
-          {t("BackupManagement")}
+        <Text
+          strong
+          style={{ float: 'left', marginLeft: '15px', marginRight: '15px' }}
+        >
+          {t('BackupManagement')}
         </Text>
       </Header>
       <Content
         className="site-layout-background"
         style={{
-          margin: "30px 30px",
+          margin: '30px 30px',
           padding: 24,
           minHeight: 280,
         }}
       >
-        <Header className="site-layout-background" style={{ padding: "0px" }}>
-          <span>{t("ChooseCluster")}</span>
-          <Select value={clusterName} onChange={value => selectCluster(value)} placeholder={t("PleaseSelectEtcdCluster")}>
+        <Header className="site-layout-background" style={{ padding: '0px' }}>
+          <span>{t('ChooseCluster')}</span>
+          <Select
+            value={clusterName}
+            onChange={(value) => selectCluster(value)}
+            placeholder={t('PleaseSelectEtcdCluster')}
+          >
             {clusterList.map((item: any) => {
               return (
-                <Select.Option key={item.metadata.name} value={item.metadata.name}>
+                <Select.Option
+                  key={item.metadata.name}
+                  value={item.metadata.name}
+                >
                   {item.metadata.name}
                 </Select.Option>
               );
             })}
           </Select>
         </Header>
-        {backupInfo === undefined ? <Empty description={`{${t("Cluster")}${clusterName}${t("HasNotYetEnabledTheBackupFeature")}}`} /> : <Table dataSource={backupInfo} columns={columnList} style={{ marginTop: "10px" }} loading={isLoading} />}
+        {backupInfo === undefined ? (
+          <Empty
+            description={`{${t('Cluster')}${clusterName}${t(
+              'HasNotYetEnabledTheBackupFeature',
+            )}}`}
+          />
+        ) : (
+          <Table
+            dataSource={backupInfo}
+            columns={columnList}
+            style={{ marginTop: '10px' }}
+            loading={isLoading}
+          />
+        )}
       </Content>
     </Layout>
   );

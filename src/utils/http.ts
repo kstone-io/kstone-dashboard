@@ -16,50 +16,52 @@
  * specific language governing permissions and limitations under the License.
  */
 
-import axios, { AxiosRequestConfig, AxiosResponse } from "axios";
-import { message } from "antd";
-import i18n from "src/languages/i18n";
+import axios, { AxiosRequestConfig, AxiosResponse } from 'axios';
+import { message } from 'antd';
+import i18n from 'src/languages/i18n';
 
 const showStatus = (status: number) => {
-  let message = "";
+  let message = '';
   switch (status) {
     case 400:
-      message = i18n.t("400BadRequest");
+      message = i18n.t('400BadRequest');
       break;
     case 401:
-      message = i18n.t("401Unauthorized");
+      message = i18n.t('401Unauthorized');
       break;
     case 403:
-      message = i18n.t("403Forbidden");
+      message = i18n.t('403Forbidden');
       break;
     case 404:
-      message = i18n.t("404NotFound");
+      message = i18n.t('404NotFound');
       break;
     case 408:
-      message = i18n.t("408RequestTimeout");
+      message = i18n.t('408RequestTimeout');
       break;
     case 500:
-      message = i18n.t("InternalServerError");
+      message = i18n.t('InternalServerError');
       break;
     case 501:
-      message = i18n.t("NotImplemented");
+      message = i18n.t('NotImplemented');
       break;
     case 502:
-      message = i18n.t("502BadGateway");
+      message = i18n.t('502BadGateway');
       break;
     case 503:
-      message = i18n.t("ServiceUnavailable");
+      message = i18n.t('ServiceUnavailable');
       break;
     case 504:
-      message = i18n.t("504GatewayTimeout");
+      message = i18n.t('504GatewayTimeout');
       break;
     case 505:
-      message = i18n.t("HTTPVersionNotSupported");
+      message = i18n.t('HTTPVersionNotSupported');
       break;
     default:
-      message = `${i18n.t("ConnectionError")}(${status})!`;
+      message = `${i18n.t('ConnectionError')}(${status})!`;
   }
-  return `${message}，${i18n.t("PleaseCheckTheNetworkOrContactTheAdministrator")}!`;
+  return `${message}，${i18n.t(
+    'PleaseCheckTheNetworkOrContactTheAdministrator',
+  )}!`;
 };
 
 const HTTP = axios.create({
@@ -67,7 +69,7 @@ const HTTP = axios.create({
   withCredentials: true,
   timeout: 200000,
   transformRequest: [
-    data => {
+    (data) => {
       data = JSON.stringify(data);
       return data;
     },
@@ -83,24 +85,24 @@ HTTP.interceptors.request.use(
   (config: AxiosRequestConfig) => {
     return config;
   },
-  error => {
+  (error) => {
     // 错误抛到业务代码
     error.data = {};
-    error.data.msg = i18n.t("TheServerIsAbnormal");
+    error.data.msg = i18n.t('TheServerIsAbnormal');
     message.error({ content: error.data.msg });
     return Promise.resolve(error);
-  }
+  },
 );
 
 // 响应拦截器
 HTTP.interceptors.response.use(
   (response: AxiosResponse) => {
     const status = response.status;
-    let msg = "";
+    let msg = '';
     if (status < 200 || status >= 300) {
       // 处理http错误，抛到业务代码
       msg = response.data?.message ?? showStatus(status);
-      if (typeof response.data === "string") {
+      if (typeof response.data === 'string') {
         response.data = { msg };
       } else {
         response.data.msg = msg;
@@ -110,13 +112,13 @@ HTTP.interceptors.response.use(
       return response;
     }
   },
-  error => {
+  (error) => {
     // 错误抛到业务代码
     error.data = {};
-    error.data.msg = i18n.t("TheRequestTimedOutOrTheServerWasAbnormal");
+    error.data.msg = i18n.t('TheRequestTimedOutOrTheServerWasAbnormal');
     message.error({ content: error.data.msg });
     return Promise.resolve(error);
-  }
+  },
 );
 
 export default HTTP;

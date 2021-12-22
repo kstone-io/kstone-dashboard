@@ -16,12 +16,22 @@
  * specific language governing permissions and limitations under the License.
  */
 
-import { useState, useEffect, useRef, useCallback } from "react";
-import { Layout, Select, Row, Col, Typography, Tree, Input, Spin, Radio } from "antd";
-import MonacoEditor from "react-monaco-editor";
-import "antd/dist/antd.css";
-import axios from "axios";
-import { useTranslation } from "react-i18next";
+import { useState, useEffect, useRef, useCallback } from 'react';
+import {
+  Layout,
+  Select,
+  Row,
+  Col,
+  Typography,
+  Tree,
+  Input,
+  Spin,
+  Radio,
+} from 'antd';
+import MonacoEditor from 'react-monaco-editor';
+import 'antd/dist/antd.css';
+import axios from 'axios';
+import { useTranslation } from 'react-i18next';
 
 const { Header, Content } = Layout;
 const { Text } = Typography;
@@ -29,15 +39,15 @@ const { Text } = Typography;
 // Visualization visualization page
 export function Visualization(): JSX.Element {
   const [clusterList, setClusterList] = useState([]);
-  const [clusterName, setClusterName] = useState("");
+  const [clusterName, setClusterName] = useState('');
   const [treeJson, setTreeJson] = useState([] as any);
   const [data, setData] = useState([]);
   const [selectKey, setSelectKey] = useState([]);
   const [jsonViewData, setJsonViewData] = useState(null as any);
-  const [viewData, setViewData] = useState("");
+  const [viewData, setViewData] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [loadingTree, setLoadingTree] = useState(true);
-  const [type, setType] = useState("javascript");
+  const [type, setType] = useState('javascript');
   const ref = useRef(null as any);
   const { t } = useTranslation();
 
@@ -46,7 +56,7 @@ export function Visualization(): JSX.Element {
   }, []);
   // fetch cluster list from api
   const getEtcdCluster = async () => {
-    axios.get("/apis/etcdclusters").then(resp => {
+    axios.get('/apis/etcdclusters').then((resp) => {
       if (resp.data.items.length) {
         setClusterList(resp.data.items);
         setClusterName(resp.data.items[0].metadata.name);
@@ -58,7 +68,7 @@ export function Visualization(): JSX.Element {
     setLoadingTree(true);
     if (clusterName.length) {
       setSelectKey([]);
-      axios.get(`/apis/etcd/${clusterName}`).then(res => {
+      axios.get(`/apis/etcd/${clusterName}`).then((res) => {
         setData(res.data.data);
         const tree = toTree(res.data.data);
         setTreeJson(tree);
@@ -69,11 +79,15 @@ export function Visualization(): JSX.Element {
   // init info
   const initEditor = useCallback(async () => {
     setIsLoading(true);
-    const res = await axios.get(`/apis/etcd/${clusterName}?key=${selectKey.join("/").replace("root", "")}`);
+    const res = await axios.get(
+      `/apis/etcd/${clusterName}?key=${selectKey
+        .join('/')
+        .replace('root', '')}`,
+    );
     if (res.data.data.length) {
       await setJsonViewData(res.data.data);
-      if (res.data.data[0].type !== "javascript") {
-        setType("json");
+      if (res.data.data[0].type !== 'javascript') {
+        setType('json');
       }
     }
     await setIsLoading(false);
@@ -86,20 +100,20 @@ export function Visualization(): JSX.Element {
   function toTree(menuData: any) {
     const tree = {};
     for (let i = 0; i < menuData.length; i++) {
-      const menu = menuData[i].split("/").map((item: any) => {
+      const menu = menuData[i].split('/').map((item: any) => {
         return item;
       });
       let obj: any = tree;
       const len: any = menu.length - 1;
 
       for (let j = 0; j < len; j++) {
-        const parentPath = j > 1 ? menu.slice(0, j).join("/") : "";
+        const parentPath = j > 1 ? menu.slice(0, j).join('/') : '';
         if (!obj[`${parentPath}/${menu[j]}`]) {
           obj[`${parentPath}/${menu[j]}`] = {};
         }
         obj = obj[`${parentPath}/${menu[j]}`];
       }
-      const parentPath = menu.slice(0, len).join("/");
+      const parentPath = menu.slice(0, len).join('/');
       if (parentPath.length) {
         obj[`${parentPath}/${menu[len]}`] = `${parentPath}/${menu[len]}`;
       } else {
@@ -108,10 +122,11 @@ export function Visualization(): JSX.Element {
     }
     // check data
     function checkData(tree: any) {
-      return Object.keys(tree).map(value => {
-        const children: any = typeof tree[value] === "string" ? undefined : checkData(tree[value]);
-        const v = value.split("/");
-        const currentKey = value === "/" ? "/" : v[v.length - 1];
+      return Object.keys(tree).map((value) => {
+        const children: any =
+          typeof tree[value] === 'string' ? undefined : checkData(tree[value]);
+        const v = value.split('/');
+        const currentKey = value === '/' ? '/' : v[v.length - 1];
         const target = {
           value: currentKey,
           title: currentKey,
@@ -148,10 +163,11 @@ export function Visualization(): JSX.Element {
 
   useEffect(() => {
     (async () => {
-      const data = jsonViewData?.find((item: any) => item.type === type)?.data ?? "";
+      const data =
+        jsonViewData?.find((item: any) => item.type === type)?.data ?? '';
       await setViewData(data);
       setTimeout(() => {
-        ref?.current?.editor.getAction("editor.action.formatDocument").run();
+        ref?.current?.editor.getAction('editor.action.formatDocument').run();
       }, 300);
     })();
   }, [type, jsonViewData]);
@@ -159,41 +175,60 @@ export function Visualization(): JSX.Element {
   const typeChangeHandle = (e: any) => {
     setType(e.target.value);
     setTimeout(() => {
-      ref?.current?.editor.getAction("editor.action.formatDocument").run();
+      ref?.current?.editor.getAction('editor.action.formatDocument').run();
     }, 300);
   };
 
   return (
     <Layout>
       <Header className="site-layout-background" style={{ padding: 0 }}>
-        <Text strong style={{ float: "left", marginLeft: "15px" }}>
-          {t("VisualizationTool")}
+        <Text strong style={{ float: 'left', marginLeft: '15px' }}>
+          {t('VisualizationTool')}
         </Text>
       </Header>
       <Content
         className="site-layout-background"
         style={{
-          margin: "30px 30px",
+          margin: '30px 30px',
           padding: 24,
           minHeight: 280,
         }}
       >
         <Header className="site-layout-background" style={{ padding: 0 }}>
-          <span>{t("ChooseCluster")}</span>
-          <Select showSearch style={{ width: 200 }} onChange={(value: string) => setClusterName(value)} placeholder={t("PleaseSelectEtcdCluster")} optionFilterProp="children" value={clusterName}>
+          <span>{t('ChooseCluster')}</span>
+          <Select
+            showSearch
+            style={{ width: 200 }}
+            onChange={(value: string) => setClusterName(value)}
+            placeholder={t('PleaseSelectEtcdCluster')}
+            optionFilterProp="children"
+            value={clusterName}
+          >
             {clusterList.map((item: any) => (
-              <Select.Option value={item.metadata.name} key={item.metadata.name}>
+              <Select.Option
+                value={item.metadata.name}
+                key={item.metadata.name}
+              >
                 {item.metadata.name}
               </Select.Option>
             ))}
           </Select>
         </Header>
-        <span>{t("SearchViewKeyValueData")}</span>
+        <span>{t('SearchViewKeyValueData')}</span>
         <Row>
           <Col span={8}>
-            <Input.Search onSearch={onSearchHandle} style={{ marginBottom: "20px" }} />
+            <Input.Search
+              onSearch={onSearchHandle}
+              style={{ marginBottom: '20px' }}
+            />
             <Spin spinning={loadingTree}>
-              <Tree height={800} treeData={treeJson} showLine={true} showIcon={false} onSelect={onSelect} />
+              <Tree
+                height={800}
+                treeData={treeJson}
+                showLine={true}
+                showIcon={false}
+                onSelect={onSelect}
+              />
             </Spin>
           </Col>
           <Col span={16}>
@@ -201,8 +236,12 @@ export function Visualization(): JSX.Element {
               {viewData ? (
                 <>
                   <Row justify="end">
-                    <div style={{ float: "right" }}>
-                      <Radio.Group value={"default"} onChange={typeChangeHandle} style={{ float: "right" }}>
+                    <div style={{ float: 'right' }}>
+                      <Radio.Group
+                        value={'default'}
+                        onChange={typeChangeHandle}
+                        style={{ float: 'right' }}
+                      >
                         {jsonViewData?.map((item: any) => {
                           return (
                             <Radio.Button key={item.type} value={item.type}>

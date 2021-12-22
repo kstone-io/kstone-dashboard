@@ -16,47 +16,60 @@
  * specific language governing permissions and limitations under the License.
  */
 
-import { useState, useEffect, useCallback } from "react";
-import { message, Layout, Typography, Form, List, InputNumber, Input, Switch, Radio, Button, Tag, Spin } from "antd";
-import { PlusOutlined, MinusOutlined } from "@ant-design/icons";
-import { useParams } from "react-router";
-import http from "src/utils/http";
-import { encode, decode } from "js-base64";
-import { useTranslation } from "react-i18next";
+import { useState, useEffect, useCallback } from 'react';
+import {
+  message,
+  Layout,
+  Typography,
+  Form,
+  List,
+  InputNumber,
+  Input,
+  Switch,
+  Radio,
+  Button,
+  Tag,
+  Spin,
+} from 'antd';
+import { PlusOutlined, MinusOutlined } from '@ant-design/icons';
+import { useParams } from 'react-router';
+import http from 'src/utils/http';
+import { encode, decode } from 'js-base64';
+import { useTranslation } from 'react-i18next';
 
 const { Header, Content } = Layout;
 const { Text } = Typography;
 const { TextArea } = Input;
 
-const MappingSymbol = "->"; // member map symbol
-const ClusterTypeImported = "imported"; // default cluster type
-const ENVSymbol = "="; // env symbol
+const MappingSymbol = '->'; // member map symbol
+const ClusterTypeImported = 'imported'; // default cluster type
+const ENVSymbol = '='; // env symbol
 // form style
 const formItemLayout = {
   labelCol: { span: 3 },
   wrapperCol: { span: 6 },
 };
-const sleep = (ms: any) => new Promise(resolve => setTimeout(resolve, ms));
+const sleep = (ms: any) => new Promise((resolve) => setTimeout(resolve, ms));
 // page of updaing cluster
 export function Update(): JSX.Element {
   // get url params
   const params: any = useParams();
   const [isLoading, setIsLoading] = useState(false);
-  const [scheme, setScheme] = useState("https");
+  const [scheme, setScheme] = useState('https');
   const [cluster, setCluster] = useState({} as any);
   const { t } = useTranslation();
 
-  const [title, setTitle] = useState(t("AssociatedCluster"));
+  const [title, setTitle] = useState(t('AssociatedCluster'));
   const [memberList, setMemberList] = useState([
     {
-      key: "",
-      value: "",
+      key: '',
+      value: '',
     },
   ]);
   const [envList, setEnvList] = useState([
     {
-      name: "",
-      value: "",
+      name: '',
+      value: '',
     },
   ]);
   // get form
@@ -64,50 +77,57 @@ export function Update(): JSX.Element {
   // handle finish
   const onFinish = async (values: any) => {
     // handle https
-    if (values.scheme === "https") {
+    if (values.scheme === 'https') {
       // init certName
       let certName: string = cluster.metadata.annotations.certName;
-      if (certName !== undefined && certName !== "") {
-        if (certName.indexOf("/") > -1) {
-          certName = certName.split("/")[1];
+      if (certName !== undefined && certName !== '') {
+        if (certName.indexOf('/') > -1) {
+          certName = certName.split('/')[1];
         }
       } else {
         certName = values.name;
       }
       // init etcd secret
       const secret: any = {
-        apiVersion: "v1",
+        apiVersion: 'v1',
         data: {
-          "ca.pem": encode(values.ca),
-          "client.pem": encode(values.clientCa),
-          "client-key.pem": encode(values.clientKey),
+          'ca.pem': encode(values.ca),
+          'client.pem': encode(values.clientCa),
+          'client-key.pem': encode(values.clientKey),
         },
-        kind: "Secret",
+        kind: 'Secret',
         metadata: {
           name: certName,
-          namespace: "kstone",
+          namespace: 'kstone',
         },
-        type: "Opaque",
+        type: 'Opaque',
       };
       // update etcd secret
-      const resp = await http.put(`/apis/secrets/${secret.metadata.name}`, secret);
-      if (resp.statusText !== "Created" && resp.status !== 409 && resp.status !== 200) {
+      const resp = await http.put(
+        `/apis/secrets/${secret.metadata.name}`,
+        secret,
+      );
+      if (
+        resp.statusText !== 'Created' &&
+        resp.status !== 409 &&
+        resp.status !== 200
+      ) {
         message.error({
-          content: t("FailedToCreateSecret"),
+          content: t('FailedToCreateSecret'),
         });
         sleep(2000);
         return;
       }
     }
     // transfer memberList to extClientURL
-    let extClientURL = "";
-    memberList.map(item => {
-      if (item.key !== "" && item.value !== "") {
+    let extClientURL = '';
+    memberList.map((item) => {
+      if (item.key !== '' && item.value !== '') {
         extClientURL += `${item.key}${MappingSymbol}${item.value},`;
       }
       return item;
     });
-    if (extClientURL !== "") {
+    if (extClientURL !== '') {
       extClientURL = extClientURL.substr(0, extClientURL.length - 1);
       cluster.metadata.annotations.extClientURL = extClientURL;
     }
@@ -115,14 +135,16 @@ export function Update(): JSX.Element {
     const envRequest = [];
     if (envList) {
       for (const item of envList) {
-        if (item.name !== "" && item.value !== "") {
+        if (item.name !== '' && item.value !== '') {
           envRequest.push(item);
         }
       }
     }
     // update cluster info
     cluster.metadata.annotations.importedAddr = `${values.scheme}://${values.endpoint}`;
-    cluster.metadata.annotations.kubernetes = values.isKubernetes ? "true" : "false";
+    cluster.metadata.annotations.kubernetes = values.isKubernetes
+      ? 'true'
+      : 'false';
     cluster.metadata.annotations.remark = values.remark;
     cluster.spec = {
       args: [],
@@ -138,63 +160,67 @@ export function Update(): JSX.Element {
       version: cluster.spec.version,
     };
     // put cluster info
-    http.put(`/apis/etcdclusters/${cluster.metadata.name}`, cluster).then(resp => {
-      if (resp.statusText === "Created" || resp.status === 200) {
-        window.location.href = "/cluster";
-      } else {
-        message.error({
-          content: resp.data.reason,
-        });
-        sleep(2000);
-      }
-    });
+    http
+      .put(`/apis/etcdclusters/${cluster.metadata.name}`, cluster)
+      .then((resp) => {
+        if (resp.statusText === 'Created' || resp.status === 200) {
+          window.location.href = '/cluster';
+        } else {
+          message.error({
+            content: resp.data.reason,
+          });
+          sleep(2000);
+        }
+      });
   };
   // init cluster info
   const initEditor = useCallback(async () => {
     setIsLoading(true);
-    setTitle(t("EditCluster"));
+    setTitle(t('EditCluster'));
     // get cluster info
-    await http.get(`/apis/etcdclusters/${params.name}`).then(resp => {
+    await http.get(`/apis/etcdclusters/${params.name}`).then((resp) => {
       setCluster(resp.data);
       const cluster: any = resp.data;
       // get certName
       let certName: string = cluster.metadata.annotations.certName;
       if (certName !== undefined) {
-        if (certName.indexOf("/") > -1) {
-          certName = certName.split("/")[1];
+        if (certName.indexOf('/') > -1) {
+          certName = certName.split('/')[1];
         }
         // get etcd secret
-        http.get(`/apis/secrets/${certName}`).then(secretResp => {
+        http.get(`/apis/secrets/${certName}`).then((secretResp) => {
           const secret = secretResp.data;
           // init form
           form.setFieldsValue({
             name: cluster.metadata.name,
             remark: cluster.metadata.annotations.remark,
-            scheme: cluster.metadata.annotations.importedAddr.split(":")[0],
-            endpoint: cluster.metadata.annotations.importedAddr.split("/")[2],
-            isKubernetes: cluster.metadata.annotations.kubernetes === "true" ? true : false,
+            scheme: cluster.metadata.annotations.importedAddr.split(':')[0],
+            endpoint: cluster.metadata.annotations.importedAddr.split('/')[2],
+            isKubernetes:
+              cluster.metadata.annotations.kubernetes === 'true' ? true : false,
             totalCpu: cluster.spec.totalCpu,
             totalMem: cluster.spec.totalMem,
             diskType: cluster.spec.diskType,
             diskSize: cluster.spec.diskSize,
             size: cluster.spec.size,
             description: cluster.spec.description,
-            ca: decode(secret.data["ca.pem"]),
-            clientCa: decode(secret.data["client.pem"]),
-            clientKey: decode(secret.data["client-key.pem"]),
+            ca: decode(secret.data['ca.pem']),
+            clientCa: decode(secret.data['client.pem']),
+            clientKey: decode(secret.data['client-key.pem']),
             version: cluster.spec.version,
           });
           // init envList
           setEnvList(cluster.spec.env ? cluster.spec.env : []);
           // init memberList
-          const extClientURL: string = cluster.metadata.annotations.extClientURL;
-          if (extClientURL && extClientURL !== "") {
-            const mapList: any = extClientURL.split(",");
+          const extClientURL: string =
+            cluster.metadata.annotations.extClientURL;
+          if (extClientURL && extClientURL !== '') {
+            const mapList: any = extClientURL.split(',');
             const resultList: any = [];
             mapList.map((item: any) => {
               resultList.push({
-                key: item.split("->")[0],
-                value: item.split("->")[1],
+                key: item.split('->')[0],
+                value: item.split('->')[1],
               });
               return item;
             });
@@ -202,14 +228,15 @@ export function Update(): JSX.Element {
           }
         });
       } else {
-        setScheme("http");
+        setScheme('http');
         // init form
         form.setFieldsValue({
           name: cluster.metadata.name,
           remark: cluster.metadata.annotations.remark,
-          scheme: cluster.metadata.annotations.importedAddr.split(":")[0],
-          endpoint: cluster.metadata.annotations.importedAddr.split("/")[2],
-          isKubernetes: cluster.metadata.annotations.kubernetes === "true" ? true : false,
+          scheme: cluster.metadata.annotations.importedAddr.split(':')[0],
+          endpoint: cluster.metadata.annotations.importedAddr.split('/')[2],
+          isKubernetes:
+            cluster.metadata.annotations.kubernetes === 'true' ? true : false,
           totalCpu: cluster.spec.totalCpu,
           totalMem: cluster.spec.totalMem,
           diskType: cluster.spec.diskType,
@@ -225,13 +252,13 @@ export function Update(): JSX.Element {
         setEnvList(cluster.spec.env);
         // init memberList
         const extClientURL: string = cluster.metadata.annotations.extClientURL;
-        if (extClientURL && extClientURL !== "") {
-          const mapList: any = extClientURL.split(",");
+        if (extClientURL && extClientURL !== '') {
+          const mapList: any = extClientURL.split(',');
           const resultList: any = [];
           mapList.map((item: any) => {
             resultList.push({
-              key: item.split("->")[0],
-              value: item.split("->")[1],
+              key: item.split('->')[0],
+              value: item.split('->')[1],
             });
             return item;
           });
@@ -252,35 +279,44 @@ export function Update(): JSX.Element {
     <Spin spinning={isLoading} delay={500} size="large">
       <Layout>
         <Header className="site-layout-background" style={{ padding: 0 }}>
-          <Text strong style={{ float: "left", marginLeft: "15px" }}>
+          <Text strong style={{ float: 'left', marginLeft: '15px' }}>
             {title}
           </Text>
         </Header>
         <Content
           className="site-layout-background"
           style={{
-            margin: "30px 30px",
+            margin: '30px 30px',
             padding: 24,
             minHeight: 280,
           }}
         >
-          <Form name="update" {...formItemLayout} onFinish={onFinish} form={form}>
-            <Form.Item label={t("ClusterName")}>
+          <Form
+            name="update"
+            {...formItemLayout}
+            onFinish={onFinish}
+            form={form}
+          >
+            <Form.Item label={t('ClusterName')}>
               <Form.Item name="name" noStyle>
                 <Input disabled></Input>
               </Form.Item>
             </Form.Item>
-            <Form.Item label={t("ClusterDescription")}>
+            <Form.Item label={t('ClusterDescription')}>
               <Form.Item name="remark" noStyle>
                 <Input></Input>
               </Form.Item>
             </Form.Item>
-            <Form.Item name="isKubernetes" label={t("Forkubernetes")} valuePropName="checked">
+            <Form.Item
+              name="isKubernetes"
+              label={t('Forkubernetes')}
+              valuePropName="checked"
+            >
               <Switch />
             </Form.Item>
-            <Form.Item name="scheme" label={t("AccessMethod")}>
+            <Form.Item name="scheme" label={t('AccessMethod')}>
               <Radio.Group
-                onChange={e => {
+                onChange={(e) => {
                   setScheme(e.target.value);
                 }}
               >
@@ -288,64 +324,91 @@ export function Update(): JSX.Element {
                 <Radio value="http">HTTP</Radio>
               </Radio.Group>
             </Form.Item>
-            <Form.Item name="endpoint" label={t("Address")} wrapperCol={{ span: 7 }}>
-              <Input addonBefore={`${scheme}://`} disabled={cluster.spec?.clusterType !== ClusterTypeImported} />
+            <Form.Item
+              name="endpoint"
+              label={t('Address')}
+              wrapperCol={{ span: 7 }}
+            >
+              <Input
+                addonBefore={`${scheme}://`}
+                disabled={cluster.spec?.clusterType !== ClusterTypeImported}
+              />
             </Form.Item>
-            <Form.Item name="totalCpu" label={t("CPUCores")}>
+            <Form.Item name="totalCpu" label={t('CPUCores')}>
               <InputNumber />
             </Form.Item>
-            <Form.Item name="totalMem" label={t("MemorySize")} wrapperCol={{ span: 3 }}>
+            <Form.Item
+              name="totalMem"
+              label={t('MemorySize')}
+              wrapperCol={{ span: 3 }}
+            >
               <InputNumber addonAfter="GB" />
             </Form.Item>
-            <Form.Item name="diskType" label={t("DiskType")} hidden={cluster.spec?.clusterType !== ClusterTypeImported}>
+            <Form.Item
+              name="diskType"
+              label={t('DiskType')}
+              hidden={cluster.spec?.clusterType !== ClusterTypeImported}
+            >
               <Radio.Group>
                 <Radio value="ssd">SSD</Radio>
-                <Radio value="basic">{t("HardDrive")}</Radio>
+                <Radio value="basic">{t('HardDrive')}</Radio>
               </Radio.Group>
             </Form.Item>
-            <Form.Item name="diskSize" label={t("DiskSize")} wrapperCol={{ span: 3 }}>
+            <Form.Item
+              name="diskSize"
+              label={t('DiskSize')}
+              wrapperCol={{ span: 3 }}
+            >
               <InputNumber addonAfter="GB" />
             </Form.Item>
-            <Form.Item name="size" label={t("ClusterSize")} wrapperCol={{ span: 3 }}>
-              <InputNumber addonAfter={t("Node")} />
+            <Form.Item
+              name="size"
+              label={t('ClusterSize')}
+              wrapperCol={{ span: 3 }}
+            >
+              <InputNumber addonAfter={t('Node')} />
             </Form.Item>
-            <Form.Item name="env" label={t("EnvironmentVariableConfiguration")} wrapperCol={{ span: 12 }}>
-              <List style={{ marginTop: "0px", paddingTop: "0px" }}>
+            <Form.Item
+              name="env"
+              label={t('EnvironmentVariableConfiguration')}
+              wrapperCol={{ span: 12 }}
+            >
+              <List style={{ marginTop: '0px', paddingTop: '0px' }}>
                 {envList?.map((item, i) => {
                   return (
                     <List.Item key={i}>
                       <Input
                         value={item.name}
-                        onChange={e => {
+                        onChange={(e) => {
                           setEnvList((labels: any) => {
                             labels[i].name = e.target.value;
                             return [...labels];
                           });
                         }}
-                        placeholder={t("EnvironmentVariableName")}
+                        placeholder={t('EnvironmentVariableName')}
                       />
                       <Tag
                         style={{
-                          marginLeft: "10px",
-                          marginRight: "10px",
+                          marginLeft: '10px',
+                          marginRight: '10px',
                         }}
                       >
                         {ENVSymbol}
                       </Tag>
                       <Input
                         value={item.value}
-                        onChange={e => {
+                        onChange={(e) => {
                           setEnvList((labels: any) => {
                             labels[i].value = e.target.value;
                             return [...labels];
                           });
                         }}
-                        placeholder={t("EnvironmentVariableValue")}
+                        placeholder={t('EnvironmentVariableValue')}
                       />
                       <Button
-                        style={{ marginLeft: "10px" }}
+                        style={{ marginLeft: '10px' }}
                         onClick={() => {
-                          setEnvList(labels => {
+                          setEnvList((labels) => {
                             labels.splice(i, 1);
                             return [...labels];
                           });
@@ -360,57 +423,72 @@ export function Update(): JSX.Element {
                   <Button
                     type="ghost"
                     onClick={() => {
-                      setEnvList(labels => [...labels, { name: "", value: "" }]);
+                      setEnvList((labels) => [
+                        ...labels,
+                        { name: '', value: '' },
+                      ]);
                     }}
                   >
                     <PlusOutlined />
                   </Button>
-                  <Typography.Link href="https://etcd.io/docs/v3.4/op-guide/configuration/" target="_blank">
-                    {t("EtcdEnvironmentConfigurations")}
+                  <Typography.Link
+                    href="https://etcd.io/docs/v3.4/op-guide/configuration/"
+                    target="_blank"
+                  >
+                    {t('EtcdEnvironmentConfigurations')}
                   </Typography.Link>
                 </List.Item>
               </List>
             </Form.Item>
-            <Form.Item label={t("ClusterNodeMapping")} wrapperCol={{ span: 12 }}>
-              <List style={{ marginTop: "0px", paddingTop: "0px" }}>
+            <Form.Item
+              label={t('ClusterNodeMapping')}
+              wrapperCol={{ span: 12 }}
+            >
+              <List style={{ marginTop: '0px', paddingTop: '0px' }}>
                 {memberList.map((item, i) => {
                   return (
                     <List.Item key={i}>
                       <Input
                         value={item.key}
-                        onChange={e => {
+                        onChange={(e) => {
                           setMemberList((labels: any) => {
                             labels[i].key = e.target.value;
                             return [...labels];
                           });
                         }}
-                        placeholder={t("PrivateAccessAddress")}
-                        disabled={cluster.spec?.clusterType !== ClusterTypeImported}
+                        placeholder={t('PrivateAccessAddress')}
+                        disabled={
+                          cluster.spec?.clusterType !== ClusterTypeImported
+                        }
                       />
                       <Tag
                         style={{
-                          marginLeft: "10px",
-                          marginRight: "10px",
+                          marginLeft: '10px',
+                          marginRight: '10px',
                         }}
                       >
                         {MappingSymbol}
                       </Tag>
                       <Input
                         value={item.value}
-                        onChange={e => {
+                        onChange={(e) => {
                           setMemberList((labels: any) => {
                             labels[i].value = e.target.value;
                             return [...labels];
                           });
                         }}
-                        placeholder={t("PublicNetworkAddress")}
-                        disabled={cluster.spec?.clusterType !== ClusterTypeImported}
+                        placeholder={t('PublicNetworkAddress')}
+                        disabled={
+                          cluster.spec?.clusterType !== ClusterTypeImported
+                        }
                       />
                       <Button
-                        style={{ marginLeft: "10px" }}
-                        disabled={cluster.spec?.clusterType !== ClusterTypeImported}
+                        style={{ marginLeft: '10px' }}
+                        disabled={
+                          cluster.spec?.clusterType !== ClusterTypeImported
+                        }
                         onClick={() => {
-                          setMemberList(labels => {
+                          setMemberList((labels) => {
                             labels.splice(i, 1);
                             return [...labels];
                           });
@@ -426,7 +504,10 @@ export function Update(): JSX.Element {
                     type="ghost"
                     disabled={cluster.spec?.clusterType !== ClusterTypeImported}
                     onClick={() => {
-                      setMemberList(labels => [...labels, { key: "", value: "" }]);
+                      setMemberList((labels) => [
+                        ...labels,
+                        { key: '', value: '' },
+                      ]);
                     }}
                   >
                     <PlusOutlined />
@@ -434,29 +515,71 @@ export function Update(): JSX.Element {
                 </List.Item>
               </List>
             </Form.Item>
-            <Form.Item noStyle shouldUpdate={(prevValues, currentValues) => prevValues.scheme !== currentValues.scheme}>
+            <Form.Item
+              noStyle
+              shouldUpdate={(prevValues, currentValues) =>
+                prevValues.scheme !== currentValues.scheme
+              }
+            >
               {({ getFieldValue }) =>
-                getFieldValue("scheme") === "https" ? (
+                getFieldValue('scheme') === 'https' ? (
                   <>
-                    <Form.Item name="ca" label={t("CACertificate")} wrapperCol={{ span: 17 }}>
-                      <TextArea placeholder={t("CACertificate")} autoSize={{ minRows: 5 }} disabled={cluster.spec?.clusterType !== ClusterTypeImported} />
+                    <Form.Item
+                      name="ca"
+                      label={t('CACertificate')}
+                      wrapperCol={{ span: 17 }}
+                    >
+                      <TextArea
+                        placeholder={t('CACertificate')}
+                        autoSize={{ minRows: 5 }}
+                        disabled={
+                          cluster.spec?.clusterType !== ClusterTypeImported
+                        }
+                      />
                     </Form.Item>
-                    <Form.Item name="clientCa" label={t("ClientCertificate")} wrapperCol={{ span: 17 }}>
-                      <TextArea placeholder={t("ClientCertificate")} autoSize={{ minRows: 5 }} disabled={cluster.spec?.clusterType !== ClusterTypeImported} />
+                    <Form.Item
+                      name="clientCa"
+                      label={t('ClientCertificate')}
+                      wrapperCol={{ span: 17 }}
+                    >
+                      <TextArea
+                        placeholder={t('ClientCertificate')}
+                        autoSize={{ minRows: 5 }}
+                        disabled={
+                          cluster.spec?.clusterType !== ClusterTypeImported
+                        }
+                      />
                     </Form.Item>
-                    <Form.Item name="clientKey" label={t("ClientPrivateKey")} wrapperCol={{ span: 17 }}>
-                      <TextArea placeholder={t("ClientPrivateKey")} autoSize={{ minRows: 5 }} disabled={cluster.spec?.clusterType !== ClusterTypeImported} />
+                    <Form.Item
+                      name="clientKey"
+                      label={t('ClientPrivateKey')}
+                      wrapperCol={{ span: 17 }}
+                    >
+                      <TextArea
+                        placeholder={t('ClientPrivateKey')}
+                        autoSize={{ minRows: 5 }}
+                        disabled={
+                          cluster.spec?.clusterType !== ClusterTypeImported
+                        }
+                      />
                     </Form.Item>
                   </>
                 ) : null
               }
             </Form.Item>
-            <Form.Item name="description" label={t("Description")} wrapperCol={{ span: 17 }}>
-              <TextArea placeholder={t("Description")} autoSize={{ minRows: 2 }} />
+            <Form.Item
+              name="description"
+              label={t('Description')}
+              wrapperCol={{ span: 17 }}
+            >
+              <TextArea
+                placeholder={t('Description')}
+                autoSize={{ minRows: 2 }}
+              />
             </Form.Item>
             <Form.Item wrapperCol={{ span: 12 }}>
               <Button type="primary" htmlType="submit">
-                {t("Submit")}
+                {t('Submit')}
               </Button>
             </Form.Item>
           </Form>

@@ -16,12 +16,14 @@
  * specific language governing permissions and limitations under the License.
  */
 
-import {
-  Navigate,
-  useRoutes
-} from 'react-router-dom';
+import { Navigate, useRoutes } from 'react-router-dom';
 import Layout from 'src/components/Layout';
-import { Cluster, Add as AddCluster, Update as UpdateCluster, Create as CreateCluster } from 'src/pages/cluster';
+import {
+  Cluster,
+  Add as AddCluster,
+  Update as UpdateCluster,
+  Create as CreateCluster,
+} from 'src/pages/cluster';
 import { menu } from 'src/configs/menu';
 import { Visualization } from 'src/pages/visualization';
 import { Monitor } from 'src/pages/monitor';
@@ -34,7 +36,7 @@ function App(): JSX.Element {
     path: '/',
     element: <Layout menu={menu} />,
     children: [
-      { path: '*', element: <Navigate to='/404' /> },
+      { path: '*', element: <Navigate to="/404" /> },
       { path: '/', element: <Cluster /> },
       { path: 'cluster', element: <Cluster /> },
       { path: 'cluster/add', element: <AddCluster /> },

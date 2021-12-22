@@ -16,12 +16,23 @@
  * specific language governing permissions and limitations under the License.
  */
 
-import { useState, useEffect } from "react";
-import { Table, Button, Layout, Tag, Dropdown, Modal, Tooltip, Typography, Menu, Space } from "antd";
-import { YamlModal } from "src/components/YamlModal";
-import { ClusterFeatureModal } from "src/components/ClusterFeatureModal";
-import http from "src/utils/http";
-import { useTranslation } from "react-i18next";
+import { useState, useEffect } from 'react';
+import {
+  Table,
+  Button,
+  Layout,
+  Tag,
+  Dropdown,
+  Modal,
+  Tooltip,
+  Typography,
+  Menu,
+  Space,
+} from 'antd';
+import { YamlModal } from 'src/components/YamlModal';
+import { ClusterFeatureModal } from 'src/components/ClusterFeatureModal';
+import http from 'src/utils/http';
+import { useTranslation } from 'react-i18next';
 const { Header, Content } = Layout;
 const { Text } = Typography;
 
@@ -37,16 +48,16 @@ export function Cluster(): JSX.Element {
   // handle operation
   const onOperation = (key: string, cluster: any) => {
     // handle edit
-    if (key === "edit") {
+    if (key === 'edit') {
       window.location.href = `/cluster/${cluster.metadata.name}`;
     }
     // handle feature gates
-    if (key === "featureGates") {
+    if (key === 'featureGates') {
       setCluster(cluster);
       setVisible(true);
     }
     // view with yaml
-    if (key === "yaml") {
+    if (key === 'yaml') {
       setCluster(cluster);
       setYamlVisible(true);
     }
@@ -54,8 +65,8 @@ export function Cluster(): JSX.Element {
   // columnList table column
   const columnList = [
     {
-      key: "name",
-      title: t("Name"),
+      key: 'name',
+      title: t('Name'),
       render: (cluster: any) => (
         <>
           <p>{cluster.metadata.name}</p>
@@ -63,11 +74,13 @@ export function Cluster(): JSX.Element {
       ),
     },
     {
-      key: "status",
+      key: 'status',
       title: () => (
         <>
-          {t("Status")}
-          <Tooltip title={t("StatusDescription")}>{/* <Icon type='info' /> */}</Tooltip>
+          {t('Status')}
+          <Tooltip title={t('StatusDescription')}>
+            {/* <Icon type='info' /> */}
+          </Tooltip>
         </>
       ),
       width: 100,
@@ -75,18 +88,18 @@ export function Cluster(): JSX.Element {
         if (cluster.status === undefined) {
           return <Tag>Unknown</Tag>;
         }
-        if (cluster.status.phase === "Running") {
-          return <Tag color="green">{t("Normal")}</Tag>;
+        if (cluster.status.phase === 'Running') {
+          return <Tag color="green">{t('Normal')}</Tag>;
         }
-        if (cluster.status.phase === "stopped") {
-          return <Tag color="green">{t("NorExceptionmal")}</Tag>;
+        if (cluster.status.phase === 'stopped') {
+          return <Tag color="green">{t('NorExceptionmal')}</Tag>;
         }
         return <Tag>{cluster.status.phase}</Tag>;
       },
     },
     {
-      key: "clusterType",
-      title: t("ClusterType"),
+      key: 'clusterType',
+      title: t('ClusterType'),
       render: (cluster: any) => (
         <>
           <p>{cluster.spec.clusterType}</p>
@@ -94,8 +107,8 @@ export function Cluster(): JSX.Element {
       ),
     },
     {
-      key: "memberCount",
-      title: t("NodeNumber"),
+      key: 'memberCount',
+      title: t('NodeNumber'),
       render: (cluster: any) => (
         <>
           <p>{cluster.spec.size}</p>
@@ -103,8 +116,8 @@ export function Cluster(): JSX.Element {
       ),
     },
     {
-      key: "spec",
-      title: t("Configurations"),
+      key: 'spec',
+      title: t('Configurations'),
       render: (cluster: any) => (
         <>
           <p>
@@ -114,32 +127,37 @@ export function Cluster(): JSX.Element {
       ),
     },
     {
-      key: "disk",
-      title: t("DiskConfiguration"),
+      key: 'disk',
+      title: t('DiskConfiguration'),
       render: (cluster: any) => (
         <>
           <p>
-            {cluster.spec.diskType} {cluster.spec.diskSize === 0 ? <></> : `${cluster.spec.diskSize}GB`}
+            {cluster.spec.diskType}{' '}
+            {cluster.spec.diskSize === 0 ? <></> : `${cluster.spec.diskSize}GB`}
           </p>
         </>
       ),
     },
     {
-      key: "operation",
-      title: t("Operation"),
+      key: 'operation',
+      title: t('Operation'),
       render: (cluster: any) => {
         const dropDownMenu = (
-          <Menu onClick={value => onOperation(value.key, cluster)}>
-            <Menu.Item key="edit">{t("Edit")}</Menu.Item>
-            <Menu.Item key="featureGates">{t("ClusterFeature")}</Menu.Item>
-            <Menu.Item key="yaml">{t("ViewYaml")}</Menu.Item>
+          <Menu onClick={(value) => onOperation(value.key, cluster)}>
+            <Menu.Item key="edit">{t('Edit')}</Menu.Item>
+            <Menu.Item key="featureGates">{t('ClusterFeature')}</Menu.Item>
+            <Menu.Item key="yaml">{t('ViewYaml')}</Menu.Item>
           </Menu>
         );
         return (
           <>
             <Dropdown overlay={dropDownMenu}>
-              <a href="/#" className="ant-dropdown-link" onClick={e => e.preventDefault()}>
-                {t("Operation")}
+              <a
+                href="/#"
+                className="ant-dropdown-link"
+                onClick={(e) => e.preventDefault()}
+              >
+                {t('Operation')}
               </a>
             </Dropdown>
             <Button
@@ -149,7 +167,7 @@ export function Cluster(): JSX.Element {
                 setDeleteVisible(true);
               }}
             >
-              {t("Delete")}
+              {t('Delete')}
             </Button>
           </>
         );
@@ -159,12 +177,12 @@ export function Cluster(): JSX.Element {
   // fetch cluster list from api
   const getEtcdClusters = () => {
     setIsLoading(true);
-    http.get("/apis/etcdclusters").then(resp => {
+    http.get('/apis/etcdclusters').then((resp) => {
       setClusterList(
         resp.data.items?.map((item: any) => {
           item.key = item.metadata.name;
           return item;
-        })
+        }),
       );
       setIsLoading(false);
     });
@@ -178,14 +196,14 @@ export function Cluster(): JSX.Element {
     <>
       <Layout>
         <Header className="site-layout-background" style={{ padding: 0 }}>
-          <Text strong style={{ float: "left", marginLeft: "15px" }}>
-            {t("ClusterManagement")}
+          <Text strong style={{ float: 'left', marginLeft: '15px' }}>
+            {t('ClusterManagement')}
           </Text>
         </Header>
         <Content
           className="site-layout-background"
           style={{
-            margin: "30px 30px",
+            margin: '30px 30px',
             padding: 24,
             minHeight: 280,
           }}
@@ -194,21 +212,26 @@ export function Cluster(): JSX.Element {
             <Button
               type="primary"
               onClick={() => {
-                window.location.href = "/cluster/add";
+                window.location.href = '/cluster/add';
               }}
             >
-              {t("AssociatedCluster")}
+              {t('AssociatedCluster')}
             </Button>
             <Button
               type="primary"
               onClick={() => {
-                window.location.href = "/cluster/create";
+                window.location.href = '/cluster/create';
               }}
             >
-              {t("CreateCluster")}
+              {t('CreateCluster')}
             </Button>
           </Space>
-          <Table dataSource={clusterList} columns={columnList} loading={isLoading} style={{ marginTop: "10px" }} />
+          <Table
+            dataSource={clusterList}
+            columns={columnList}
+            loading={isLoading}
+            style={{ marginTop: '10px' }}
+          />
         </Content>
       </Layout>
       {yamlVisible ? (
@@ -223,15 +246,17 @@ export function Cluster(): JSX.Element {
       {deleteVisible ? (
         <Modal
           visible={deleteVisible}
-          title={t("ConfirmDelete")}
+          title={t('ConfirmDelete')}
           onCancel={() => setDeleteVisible(false)}
           onOk={() => {
-            http.delete(`/apis/etcdclusters/${cluster.metadata.name}`).then(() => {
-              window.location.href = "/cluster";
-            });
+            http
+              .delete(`/apis/etcdclusters/${cluster.metadata.name}`)
+              .then(() => {
+                window.location.href = '/cluster';
+              });
           }}
         >
-          {t("AreYouSureToDeleteTheCluster")}
+          {t('AreYouSureToDeleteTheCluster')}
           <Text type="danger">{cluster.metadata.name}</Text>
         </Modal>
       ) : null}
