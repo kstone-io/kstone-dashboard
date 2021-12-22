@@ -15,23 +15,24 @@
  * WARRANTIES OF ANY KIND, either express or implied.  See the License for the
  * specific language governing permissions and limitations under the License.
  */
+import i18n from "src/languages/i18n";
 
-const prefix = 'dynamic-inserted-css-';
+const prefix = "dynamic-inserted-css-";
 
 // CheckEndpoint
 export function CheckEndpoint(endpoint: string): string {
-  let endpointMsg = '';
+  let endpointMsg = "";
 
   if (endpoint) {
-    if (endpoint.indexOf(':') === -1) {
-      endpointMsg = '请输入etcd访问端口';
+    if (endpoint.indexOf(":") === -1) {
+      endpointMsg = i18n.t("PleaseInputTheEtcdAccessPort");
     } else {
-      if (endpoint.split(':')[1].length < 2) {
-        endpointMsg = '请输入正确的etcd访问端口';
+      if (endpoint.split(":")[1].length < 2) {
+        endpointMsg = i18n.t("PleaseInputTheCorrectEtcdAccessPort");
       }
     }
   } else {
-    endpointMsg = '请填写访问地址';
+    endpointMsg = i18n.t("PleaseInputTheAccessAddress");
   }
 
   return endpointMsg;
@@ -39,19 +40,18 @@ export function CheckEndpoint(endpoint: string): string {
 
 // CheckK8sName
 export function CheckK8sName(name: string): string {
-  let k8sNameMsg = '';
+  let k8sNameMsg = "";
 
   const reg = /^[a-z0-9]([-a-z0-9]*[a-z0-9])?$/;
 
   if (name) {
     if (reg.test(name)) {
-      k8sNameMsg = '';
+      k8sNameMsg = "";
     } else {
-      k8sNameMsg =
-        '输入名称不符合规则，请参考正则: [a-z0-9]([-a-z0-9]*[a-z0-9])?';
+      k8sNameMsg = `${i18n.t("TheInputNameDoesNotMeetTheRulesPleaseReferToTheRegularRules")} [a-z0-9]([-a-z0-9]*[a-z0-9])?`;
     }
   } else {
-    k8sNameMsg = '请输入对应名称';
+    k8sNameMsg = i18n.t("PleaseInputTheCorrespondingName");
   }
 
   return k8sNameMsg;
@@ -64,11 +64,11 @@ export function insertCSS(id: string, cssText: string): HTMLStyleElement {
   let style: HTMLStyleElement;
   style = document.getElementById(prefix + id) as HTMLStyleElement;
   if (!style) {
-    style = document.createElement('style');
+    style = document.createElement("style");
     style.id = prefix + id;
 
     // IE8/9 can not use document.head
-    document.getElementsByTagName('head')[0].appendChild(style);
+    document.getElementsByTagName("head")[0].appendChild(style);
   }
   if (style.textContent !== cssText) {
     style.textContent = cssText;
@@ -78,9 +78,10 @@ export function insertCSS(id: string, cssText: string): HTMLStyleElement {
 
 // FormatBytes
 export function FormatBytes(a: number, b: number): string {
-  if (0 === a) return '0 Bytes';
-  const c = 1024, d = b || 2, e = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'],
+  if (0 === a) return "0 Bytes";
+  const c = 1024,
+    d = b || 2,
+    e = ["Bytes", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"],
     f = Math.floor(Math.log(a) / Math.log(c));
-  return parseFloat((a / Math.pow(c, f)).toFixed(d)) + ' ' + e[f];
+  return parseFloat((a / Math.pow(c, f)).toFixed(d)) + " " + e[f];
 }
-
