@@ -21,7 +21,7 @@
   "Create": "Create",
   "DiskSize": "Disk size",
   "DiskType": "Disk type",
-  "DiskConfiguration": "Disk configuration",
+  "DiskConfiguration": "Disk Configuration",
   "CPUCores": "CPU Cores",
   "EtcdVersion": "Etcd Version",
   "EtcdEnvironmentConfigurations": "Etcd Environment Configurations?",

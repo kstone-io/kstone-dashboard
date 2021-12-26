@@ -267,7 +267,7 @@ export function Update(): JSX.Element {
       }
     });
     await setIsLoading(false);
-  }, [form, params.name]);
+  }, [form, params.name, t]);
   // init page
   useEffect(() => {
     if (params.name !== undefined) {

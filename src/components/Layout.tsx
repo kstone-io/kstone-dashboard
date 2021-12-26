@@ -16,15 +16,14 @@
  * specific language governing permissions and limitations under the License.
  */
 
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Outlet, Link } from 'react-router-dom';
 import {
-  Button,
   ConfigProvider,
   Dropdown,
   Layout as AntdLayout,
   Menu,
-  Select,
+  Button,
 } from 'antd';
 import { ClusterOutlined } from '@ant-design/icons';
 import logo from '../../src/logo.png';
@@ -63,18 +62,13 @@ const Layout = ({ menu }: { menu: any }): JSX.Element => {
   );
   return (
     <AntdLayout style={{ height: '100%' }}>
-      <Header
-        style={{ position: 'fixed', zIndex: 1, width: '100%', padding: 0 }}
-      >
+      <Header style={{ position: 'fixed', zIndex: 1, width: '100%', padding: 0 }}>
         <div className="logo">
           <img src={logo} alt="logo" width="120px" />
           <Dropdown overlay={menus} trigger={['click', 'hover']}>
-            <a
-              className="ant-dropdown-link"
-              onClick={(e) => e.preventDefault()}
-            >
+            <Button type="link" className="ant-dropdown-link" onClick={(e: any) => e.preventDefault()}>
               {lang === 'zh-CN' ? '中文' : 'English'} <DownOutlined />
-            </a>
+            </Button>
           </Dropdown>
         </div>
       </Header>
@@ -94,7 +88,6 @@ const Layout = ({ menu }: { menu: any }): JSX.Element => {
           >
             <Menu
               mode="inline"
-              // defaultSelectedKeys={['cluster']}
               defaultOpenKeys={menu.items.map((item: any) => item.key)}
               style={{ height: '100%' }}
               theme="dark"
