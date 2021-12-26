@@ -9,7 +9,7 @@
   "EditCluster": "编辑集群",
   "CACertificate": "CA证书",
   "Operation": "操作",
-  "ViewYaml": "查看yaml",
+  "ViewYaml": "查看YAML",
   "AccessMethod": "访问方式",
   "StorageLevel": "存储级别",
   "FeatureGates": "功能项开关",

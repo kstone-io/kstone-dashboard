@@ -34,7 +34,7 @@
   "ClusterNodeMapping": "Cluster Node Mapping",
   "ClusterType": "Cluster Type",
   "ClusterName": "Cluster Name",
-  "MonitorAndInspection": "Monitor Inspection",
+  "MonitorAndInspection": "Monitor/Inspection",
   "Node": "Node",
   "NodeNumber": "Node Number",
   "ClientPrivateKey": "Client Private Key",

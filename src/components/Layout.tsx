@@ -84,6 +84,7 @@ const Layout = ({ menu }: { menu: any }): JSX.Element => {
             collapsible
             collapsed={collapsed}
             onCollapse={() => setCollapsed(!collapsed)}
+            width={250}
             style={{
               overflow: 'auto',
               height: '100vh',
@@ -131,7 +132,7 @@ const Layout = ({ menu }: { menu: any }): JSX.Element => {
               if (collapsed) {
                 return { marginLeft: '80px', minHeight: '100%' };
               } else {
-                return { marginLeft: '200px', minHeight: '100%' };
+                return { marginLeft: '250px', minHeight: '100%' };
               }
             })()}
           >
