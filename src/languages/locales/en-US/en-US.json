@@ -24,7 +24,7 @@
   "DiskConfiguration": "Disk configuration",
   "CPUCores": "CPU Cores",
   "EtcdVersion": "Etcd Version",
-  "EtcdEnvironmentConfigurations": "Etcd Environment Configurations",
+  "EtcdEnvironmentConfigurations": "Etcd Environment Configurations?",
   "Address": "Address",
   "ClusterDescription": "Cluster Description",
   "ClusterFeature": "Cluster Feature",
