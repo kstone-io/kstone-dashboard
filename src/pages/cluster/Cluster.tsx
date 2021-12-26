@@ -215,7 +215,7 @@ export function Cluster(): JSX.Element {
                 window.location.href = '/cluster/add';
               }}
             >
-              {t('AssociatedCluster')}
+              {t('ImortCluster')}
             </Button>
             <Button
               type="primary"

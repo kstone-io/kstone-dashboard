@@ -59,7 +59,7 @@ export function Update(): JSX.Element {
   const [cluster, setCluster] = useState({} as any);
   const { t } = useTranslation();
 
-  const [title, setTitle] = useState(t('AssociatedCluster'));
+  const [title, setTitle] = useState(t('ImortCluster'));
   const [memberList, setMemberList] = useState([
     {
       key: '',

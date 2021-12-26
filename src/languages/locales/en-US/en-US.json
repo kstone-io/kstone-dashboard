@@ -13,7 +13,7 @@
   "AccessMethod": "access method",
   "StorageLevel": "Storage level",
   "FeatureGates": "Feature Gates",
-  "AssociatedCluster": "Associated Cluster",
+  "ImortCluster": "Import Cluster",
   "EnvironmentVariableName": "Environment variable name",
   "EnvironmentVariableValue": "Environment variable value",
   "EnvironmentVariableConfiguration": "Environment variable configuration",
