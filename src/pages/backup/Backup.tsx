@@ -17,15 +17,10 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import {
-  Layout,
-  Typography,
-  Select,
-  Table,
-  Empty
-} from 'antd';
+import { Layout, Typography, Select, Table, Empty } from 'antd';
 import http from 'src/utils/http';
 import { FormatBytes } from 'src/utils/common';
+import { useTranslation } from 'react-i18next';
 
 const { Text } = Typography;
 const { Header, Content } = Layout;
@@ -37,11 +32,12 @@ export function Backup(): JSX.Element {
   const [clusterName, setClusterName] = useState('');
   const [backupInfo, setBackupInfo] = useState([] as any);
   const [isLoading, setIsLoading] = useState(false);
+  const { t } = useTranslation();
 
   const columnList = [
     {
       key: 'Key',
-      header: '文件名称',
+      header: t('FileName'),
       width: 200,
       render: (item: any) => (
         <>
@@ -51,7 +47,7 @@ export function Backup(): JSX.Element {
     },
     {
       key: 'StorageClass',
-      header: '存储级别',
+      header: t('StorageLevel'),
       width: 100,
       render: (item: any) => (
         <>
@@ -61,7 +57,7 @@ export function Backup(): JSX.Element {
     },
     {
       key: 'LastModified',
-      header: '最后更新时间',
+      header: t('LastUpdateTime'),
       width: 100,
       render: (item: any) => (
         <>
@@ -71,7 +67,7 @@ export function Backup(): JSX.Element {
     },
     {
       key: 'Size',
-      header: '文件大小',
+      header: t('FileSize'),
       width: 100,
       render: (item: any) => (
         <>
@@ -125,44 +121,58 @@ export function Backup(): JSX.Element {
     });
   };
 
-  return (<Layout>
-    <Header className='site-layout-background' style={{ padding: 0 }}>
-      <Text strong style={{ float: 'left', marginLeft: '15px', marginRight: '15px' }}>备份管理</Text>
-    </Header>
-    <Content
-      className='site-layout-background'
-      style={{
-        margin: '30px 30px',
-        padding: 24,
-        minHeight: 280,
-      }}
-    >
-      <Header className='site-layout-background' style={{ padding: '0px' }}>
-        <span>选择集群：</span>
-        <Select
-          value={clusterName}
-          onChange={(value) => selectCluster(value)}
-          placeholder='请选择etcd集群'
+  return (
+    <Layout>
+      <Header className="site-layout-background" style={{ padding: 0 }}>
+        <Text
+          strong
+          style={{ float: 'left', marginLeft: '15px', marginRight: '15px' }}
         >
-          {
-            clusterList.map((item: any) => {
-              return <Select.Option
-                key={item.metadata.name}
-                value={item.metadata.name}>{item.metadata.name}</Select.Option>;
-            })
-          }
-        </Select>
+          {t('BackupManagement')}
+        </Text>
       </Header>
-      {
-        backupInfo === undefined ? (
-          <Empty description={`{集群${clusterName}暂未开启备份功能}`} />
-        ) : (<Table
-          dataSource={backupInfo}
-          columns={columnList}
-          style={{ marginTop: '10px' }}
-          loading={isLoading}
-        />)
-      }
-    </Content>
-  </Layout>);
+      <Content
+        className="site-layout-background"
+        style={{
+          margin: '30px 30px',
+          padding: 24,
+          minHeight: 280,
+        }}
+      >
+        <Header className="site-layout-background" style={{ padding: '0px' }}>
+          <span>{t('ChooseCluster')}</span>
+          <Select
+            value={clusterName}
+            onChange={(value) => selectCluster(value)}
+            placeholder={t('PleaseSelectEtcdCluster')}
+          >
+            {clusterList.map((item: any) => {
+              return (
+                <Select.Option
+                  key={item.metadata.name}
+                  value={item.metadata.name}
+                >
+                  {item.metadata.name}
+                </Select.Option>
+              );
+            })}
+          </Select>
+        </Header>
+        {backupInfo === undefined ? (
+          <Empty
+            description={`{${t('Cluster')}${clusterName}${t(
+              'HasNotYetEnabledTheBackupFeature',
+            )}}`}
+          />
+        ) : (
+          <Table
+            dataSource={backupInfo}
+            columns={columnList}
+            style={{ marginTop: '10px' }}
+            loading={isLoading}
+          />
+        )}
+      </Content>
+    </Layout>
+  );
 }

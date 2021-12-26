@@ -31,6 +31,7 @@ import {
 import MonacoEditor from 'react-monaco-editor';
 import 'antd/dist/antd.css';
 import axios from 'axios';
+import { useTranslation } from 'react-i18next';
 
 const { Header, Content } = Layout;
 const { Text } = Typography;
@@ -48,6 +49,7 @@ export function Visualization(): JSX.Element {
   const [loadingTree, setLoadingTree] = useState(true);
   const [type, setType] = useState('javascript');
   const ref = useRef(null as any);
+  const { t } = useTranslation();
 
   useEffect(() => {
     getEtcdCluster();
@@ -77,7 +79,11 @@ export function Visualization(): JSX.Element {
   // init info
   const initEditor = useCallback(async () => {
     setIsLoading(true);
-    const res = await axios.get(`/apis/etcd/${clusterName}?key=${selectKey.join('/').replace('root', '')}`);
+    const res = await axios.get(
+      `/apis/etcd/${clusterName}?key=${selectKey
+        .join('/')
+        .replace('root', '')}`,
+    );
     if (res.data.data.length) {
       await setJsonViewData(res.data.data);
       if (res.data.data[0].type !== 'javascript') {
@@ -157,7 +163,8 @@ export function Visualization(): JSX.Element {
 
   useEffect(() => {
     (async () => {
-      const data = jsonViewData?.find((item: any) => item.type === type)?.data ?? '';
+      const data =
+        jsonViewData?.find((item: any) => item.type === type)?.data ?? '';
       await setViewData(data);
       setTimeout(() => {
         ref?.current?.editor.getAction('editor.action.formatDocument').run();
@@ -174,35 +181,40 @@ export function Visualization(): JSX.Element {
 
   return (
     <Layout>
-      <Header className='site-layout-background' style={{ padding: 0 }}>
-        <Text strong style={{ float: 'left', marginLeft: '15px' }}>可视化工具</Text>
+      <Header className="site-layout-background" style={{ padding: 0 }}>
+        <Text strong style={{ float: 'left', marginLeft: '15px' }}>
+          {t('VisualizationTool')}
+        </Text>
       </Header>
       <Content
-        className='site-layout-background'
+        className="site-layout-background"
         style={{
           margin: '30px 30px',
           padding: 24,
           minHeight: 280,
         }}
       >
-        <Header className='site-layout-background' style={{ padding: 0 }}>
-          <span>选择集群：</span>
+        <Header className="site-layout-background" style={{ padding: 0 }}>
+          <span>{t('ChooseCluster')}</span>
           <Select
             showSearch
             style={{ width: 200 }}
             onChange={(value: string) => setClusterName(value)}
-            placeholder='请选择etcd集群'
-            optionFilterProp='children'
+            placeholder={t('PleaseSelectEtcdCluster')}
+            optionFilterProp="children"
             value={clusterName}
           >
-            {
-              clusterList.map((item: any) => <Select.Option
+            {clusterList.map((item: any) => (
+              <Select.Option
                 value={item.metadata.name}
-                key={item.metadata.name}>{item.metadata.name}</Select.Option>)
-            }
+                key={item.metadata.name}
+              >
+                {item.metadata.name}
+              </Select.Option>
+            ))}
           </Select>
         </Header>
-        <span>搜索：查看Key-Value数据</span>
+        <span>{t('SearchViewKeyValueData')}</span>
         <Row>
           <Col span={8}>
             <Input.Search
@@ -218,20 +230,25 @@ export function Visualization(): JSX.Element {
                 onSelect={onSelect}
               />
             </Spin>
-
           </Col>
           <Col span={16}>
             <Spin spinning={isLoading}>
               {viewData ? (
                 <>
-                  <Row justify='end' >
+                  <Row justify="end">
                     <div style={{ float: 'right' }}>
-                      <Radio.Group value={'default'} onChange={typeChangeHandle} style={{ float: 'right' }}>
-                        {
-                          jsonViewData?.map((item: any) => {
-                            return <Radio.Button key={item.type} value={item.type}>{item.type}</Radio.Button>;
-                          })
-                        }
+                      <Radio.Group
+                        value={'default'}
+                        onChange={typeChangeHandle}
+                        style={{ float: 'right' }}
+                      >
+                        {jsonViewData?.map((item: any) => {
+                          return (
+                            <Radio.Button key={item.type} value={item.type}>
+                              {item.type}
+                            </Radio.Button>
+                          );
+                        })}
                       </Radio.Group>
                     </div>
                   </Row>
@@ -241,9 +258,11 @@ export function Visualization(): JSX.Element {
                       height={800}
                       language={type}
                       value={viewData}
-                      options={{
-                        // readOnly: true,
-                      }}
+                      options={
+                        {
+                          // readOnly: true,
+                        }
+                      }
                     />
                   </Row>
                 </>

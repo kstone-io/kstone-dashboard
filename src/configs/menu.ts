@@ -17,6 +17,7 @@
  */
 
 import { AppMenu } from '../models/menu';
+import i18n from 'src/languages/i18n';
 
 /**
  * 定义导航菜单
@@ -26,42 +27,40 @@ export const menu: AppMenu = {
   items: [
     {
       key: 'clusterManager',
-      title: '集群管理',
-      items:
-      [
+      title: i18n.t('ClusterManagement'),
+      items: [
         {
           key: 'addCluster',
           route: '/cluster/add',
-          title: '关联集群'
+          title: i18n.t('AssociatedCluster'),
         },
         {
           key: 'cluster',
           route: '/cluster',
-          title: '集群管理'
+          title: i18n.t('ClusterManagement'),
         },
-      ]
+      ],
     },
     {
-      title: '运维中心',
+      title: i18n.t('OperationCenter'),
       key: 'operation',
-      items:
-      [
+      items: [
         {
           key: 'visualization',
           route: '/visualization',
-          title: '可视化工具',
+          title: i18n.t('VisualizationTool'),
         },
         {
           key: 'monitor',
           route: '/monitor',
-          title: '监控和巡检'
+          title: i18n.t('MonitorAndInspection'),
         },
         {
           key: 'backup',
           route: '/backup',
-          title: '备份管理'
-        }
-      ]
+          title: i18n.t('BackupManagement'),
+        },
+      ],
     },
-  ]
+  ],
 };

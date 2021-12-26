@@ -32,7 +32,7 @@ import {
 import { YamlModal } from 'src/components/YamlModal';
 import { ClusterFeatureModal } from 'src/components/ClusterFeatureModal';
 import http from 'src/utils/http';
-
+import { useTranslation } from 'react-i18next';
 const { Header, Content } = Layout;
 const { Text } = Typography;
 
@@ -44,6 +44,7 @@ export function Cluster(): JSX.Element {
   const [yamlVisible, setYamlVisible] = useState(false);
   const [deleteVisible, setDeleteVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const { t } = useTranslation();
   // handle operation
   const onOperation = (key: string, cluster: any) => {
     // handle edit
@@ -65,7 +66,7 @@ export function Cluster(): JSX.Element {
   const columnList = [
     {
       key: 'name',
-      title: '名称',
+      title: t('Name'),
       render: (cluster: any) => (
         <>
           <p>{cluster.metadata.name}</p>
@@ -76,8 +77,8 @@ export function Cluster(): JSX.Element {
       key: 'status',
       title: () => (
         <>
-          状态
-          <Tooltip title='状态描述'>
+          {t('Status')}
+          <Tooltip title={t('StatusDescription')}>
             {/* <Icon type='info' /> */}
           </Tooltip>
         </>
@@ -88,17 +89,17 @@ export function Cluster(): JSX.Element {
           return <Tag>Unknown</Tag>;
         }
         if (cluster.status.phase === 'Running') {
-          return <Tag color='green'>正常</Tag>;
+          return <Tag color="green">{t('Normal')}</Tag>;
         }
         if (cluster.status.phase === 'stopped') {
-          return <Tag color='green'>异常</Tag>;
+          return <Tag color="green">{t('NorExceptionmal')}</Tag>;
         }
         return <Tag>{cluster.status.phase}</Tag>;
       },
     },
     {
       key: 'clusterType',
-      title: '集群类型',
+      title: t('ClusterType'),
       render: (cluster: any) => (
         <>
           <p>{cluster.spec.clusterType}</p>
@@ -107,7 +108,7 @@ export function Cluster(): JSX.Element {
     },
     {
       key: 'memberCount',
-      title: '节点个数',
+      title: t('NodeNumber'),
       render: (cluster: any) => (
         <>
           <p>{cluster.spec.size}</p>
@@ -116,7 +117,7 @@ export function Cluster(): JSX.Element {
     },
     {
       key: 'spec',
-      title: '配置',
+      title: t('Configurations'),
       render: (cluster: any) => (
         <>
           <p>
@@ -127,7 +128,7 @@ export function Cluster(): JSX.Element {
     },
     {
       key: 'disk',
-      title: '磁盘配置',
+      title: t('DiskConfiguration'),
       render: (cluster: any) => (
         <>
           <p>
@@ -139,39 +140,50 @@ export function Cluster(): JSX.Element {
     },
     {
       key: 'operation',
-      title: '操作',
+      title: t('Operation'),
       render: (cluster: any) => {
         const dropDownMenu = (
-          <Menu onClick={value => onOperation(value.key, cluster)}>
-            <Menu.Item key='edit'>编辑</Menu.Item>
-            <Menu.Item key='featureGates'>集群功能项</Menu.Item>
-            <Menu.Item key='yaml'>查看YAML</Menu.Item>
+          <Menu onClick={(value) => onOperation(value.key, cluster)}>
+            <Menu.Item key="edit">{t('Edit')}</Menu.Item>
+            <Menu.Item key="featureGates">{t('ClusterFeature')}</Menu.Item>
+            <Menu.Item key="yaml">{t('ViewYaml')}</Menu.Item>
           </Menu>
         );
         return (
           <>
             <Dropdown overlay={dropDownMenu}>
-              <a href='/#' className='ant-dropdown-link' onClick={e => e.preventDefault()}>
-                操作
+              <a
+                href="/#"
+                className="ant-dropdown-link"
+                onClick={(e) => e.preventDefault()}
+              >
+                {t('Operation')}
               </a>
             </Dropdown>
-            <Button type='link' onClick={() => {
-              setCluster(cluster);
-              setDeleteVisible(true);
-            }}>删除</Button>
+            <Button
+              type="link"
+              onClick={() => {
+                setCluster(cluster);
+                setDeleteVisible(true);
+              }}
+            >
+              {t('Delete')}
+            </Button>
           </>
         );
-      }
-    }
+      },
+    },
   ];
   // fetch cluster list from api
   const getEtcdClusters = () => {
     setIsLoading(true);
     http.get('/apis/etcdclusters').then((resp) => {
-      setClusterList(resp.data.items.map((item: any) => {
-        item.key = item.metadata.name;
-        return item;
-      }));
+      setClusterList(
+        resp.data.items?.map((item: any) => {
+          item.key = item.metadata.name;
+          return item;
+        }),
+      );
       setIsLoading(false);
     });
   };
@@ -180,47 +192,49 @@ export function Cluster(): JSX.Element {
     getEtcdClusters();
   }, []);
   // render
-  return <>
-    <Layout>
-      <Header className='site-layout-background' style={{ padding: 0 }}>
-        <Text strong style={{ float: 'left', marginLeft: '15px' }}>集群管理</Text>
-      </Header>
-      <Content
-        className='site-layout-background'
-        style={{
-          margin: '30px 30px',
-          padding: 24,
-          minHeight: 280,
-        }}
-      >
-        <Space>
-          <Button
-            type='primary'
-            onClick={() => {
-              window.location.href = '/cluster/add';
-            }}
-          >
-            关联集群
-          </Button>
-          <Button
-            type='primary'
-            onClick={() => {
-              window.location.href = '/cluster/create';
-            }}
-          >
-            新建集群
-          </Button>
-        </Space>
-        <Table
-          dataSource={clusterList}
-          columns={columnList}
-          loading={isLoading}
-          style={{ marginTop: '10px' }}
-        />
-      </Content>
-    </Layout>
-    {
-      yamlVisible ? (
+  return (
+    <>
+      <Layout>
+        <Header className="site-layout-background" style={{ padding: 0 }}>
+          <Text strong style={{ float: 'left', marginLeft: '15px' }}>
+            {t('ClusterManagement')}
+          </Text>
+        </Header>
+        <Content
+          className="site-layout-background"
+          style={{
+            margin: '30px 30px',
+            padding: 24,
+            minHeight: 280,
+          }}
+        >
+          <Space>
+            <Button
+              type="primary"
+              onClick={() => {
+                window.location.href = '/cluster/add';
+              }}
+            >
+              {t('AssociatedCluster')}
+            </Button>
+            <Button
+              type="primary"
+              onClick={() => {
+                window.location.href = '/cluster/create';
+              }}
+            >
+              {t('CreateCluster')}
+            </Button>
+          </Space>
+          <Table
+            dataSource={clusterList}
+            columns={columnList}
+            loading={isLoading}
+            style={{ marginTop: '10px' }}
+          />
+        </Content>
+      </Layout>
+      {yamlVisible ? (
         <YamlModal
           onclose={() => {
             setYamlVisible(false);
@@ -228,29 +242,34 @@ export function Cluster(): JSX.Element {
           data={cluster}
           visible={yamlVisible}
         />
-      ) : null
-    }
-    {
-      deleteVisible ? (
-        <Modal visible={deleteVisible} title='确认删除' onCancel={() => setDeleteVisible(false)} onOk={() => {
-          http.delete(`/apis/etcdclusters/${cluster.metadata.name}`).then(() => {
-            window.location.href = '/cluster';
-          });
-        }}>
-          确定删除集群<Text type='danger'>{cluster.metadata.name}</Text>
+      ) : null}
+      {deleteVisible ? (
+        <Modal
+          visible={deleteVisible}
+          title={t('ConfirmDelete')}
+          onCancel={() => setDeleteVisible(false)}
+          onOk={() => {
+            http
+              .delete(`/apis/etcdclusters/${cluster.metadata.name}`)
+              .then(() => {
+                window.location.href = '/cluster';
+              });
+          }}
+        >
+          {t('AreYouSureToDeleteTheCluster')}
+          <Text type="danger">{cluster.metadata.name}</Text>
         </Modal>
-      ) : null
-    }
-    {
-      visible ? (
+      ) : null}
+      {visible ? (
         <ClusterFeatureModal
           close={() => {
             setVisible(false);
             getEtcdClusters();
           }}
           data={cluster}
-          visible={visible} />
-      ) : null
-    }
-  </>;
+          visible={visible}
+        />
+      ) : null}
+    </>
+  );
 }

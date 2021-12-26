@@ -18,16 +18,32 @@
 
 import { Modal } from 'antd';
 import * as yaml from 'js-yaml';
+import { useTranslation } from 'react-i18next';
 
 import { YamlEditorPanel } from './CodeMirrorEditor';
 
-export const YamlModal = ({ visible, data, onclose }: { visible: any, data: any, onclose: any }): JSX.Element => {
+export const YamlModal = ({
+  visible,
+  data,
+  onclose,
+}: {
+  visible: any;
+  data: any;
+  onclose: any;
+}): JSX.Element => {
+  const { t } = useTranslation();
+
   const getNodeMaster = () => {
     return yaml.dump(data);
   };
 
   return (
-    <Modal width={1000} visible={visible} title='查看yaml' onCancel={onclose}>
+    <Modal
+      width={1000}
+      visible={visible}
+      title={t('ViewYaml')}
+      onCancel={onclose}
+    >
       <div style={{ height: '600px', overflow: 'auto' }}>
         <YamlEditorPanel readOnly={true} config={getNodeMaster()} />
       </div>

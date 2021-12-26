@@ -18,47 +18,50 @@
 
 import axios, { AxiosRequestConfig, AxiosResponse } from 'axios';
 import { message } from 'antd';
+import i18n from 'src/languages/i18n';
 
 const showStatus = (status: number) => {
   let message = '';
   switch (status) {
     case 400:
-      message = '请求错误(400)';
+      message = i18n.t('400BadRequest');
       break;
     case 401:
-      message = '未授权，请重新登录(401)';
+      message = i18n.t('401Unauthorized');
       break;
     case 403:
-      message = '拒绝访问(403)';
+      message = i18n.t('403Forbidden');
       break;
     case 404:
-      message = '请求出错(404)';
+      message = i18n.t('404NotFound');
       break;
     case 408:
-      message = '请求超时(408)';
+      message = i18n.t('408RequestTimeout');
       break;
     case 500:
-      message = '服务器错误(500)';
+      message = i18n.t('InternalServerError');
       break;
     case 501:
-      message = '服务未实现(501)';
+      message = i18n.t('NotImplemented');
       break;
     case 502:
-      message = '网络错误(502)';
+      message = i18n.t('502BadGateway');
       break;
     case 503:
-      message = '服务不可用(503)';
+      message = i18n.t('ServiceUnavailable');
       break;
     case 504:
-      message = '网络超时(504)';
+      message = i18n.t('504GatewayTimeout');
       break;
     case 505:
-      message = 'HTTP版本不受支持(505)';
+      message = i18n.t('HTTPVersionNotSupported');
       break;
     default:
-      message = `连接出错(${status})!`;
+      message = `${i18n.t('ConnectionError')}(${status})!`;
   }
-  return `${message}，请检查网络或联系管理员！`;
+  return `${message}，${i18n.t(
+    'PleaseCheckTheNetworkOrContactTheAdministrator',
+  )}!`;
 };
 
 const HTTP = axios.create({
@@ -85,10 +88,10 @@ HTTP.interceptors.request.use(
   (error) => {
     // 错误抛到业务代码
     error.data = {};
-    error.data.msg = '服务器异常！';
+    error.data.msg = i18n.t('TheServerIsAbnormal');
     message.error({ content: error.data.msg });
     return Promise.resolve(error);
-  }
+  },
 );
 
 // 响应拦截器
@@ -112,10 +115,10 @@ HTTP.interceptors.response.use(
   (error) => {
     // 错误抛到业务代码
     error.data = {};
-    error.data.msg = '请求超时或服务器异常！';
+    error.data.msg = i18n.t('TheRequestTimedOutOrTheServerWasAbnormal');
     message.error({ content: error.data.msg });
     return Promise.resolve(error);
-  }
+  },
 );
 
 export default HTTP;

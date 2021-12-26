@@ -16,19 +16,12 @@
  * specific language governing permissions and limitations under the License.
  */
 
-import {
-  Modal,
-  Form,
-  Card,
-  Input,
-  Switch,
-  Spin,
-  InputNumber
-} from 'antd';
+import { Modal, Form, Card, Input, Switch, Spin, InputNumber } from 'antd';
 import { useEffect, useState } from 'react';
 import * as _ from 'lodash';
 import http from 'src/utils/http';
 import { encode, decode } from 'js-base64';
+import { useTranslation } from 'react-i18next';
 // form style
 const formItemLayout = {
   labelCol: { span: 10 },
@@ -37,7 +30,15 @@ const formItemLayout = {
 
 const FeatureGatesKey = 'featureGates';
 // page to edit feature gates
-export const ClusterFeatureModal = ({ visible, data, close }: { visible: any, data: any, close: any }): JSX.Element => {
+export const ClusterFeatureModal = ({
+  visible,
+  data,
+  close,
+}: {
+  visible: any;
+  data: any;
+  close: any;
+}): JSX.Element => {
   const [isLoading, setIsLoading] = useState(false);
   const [monitor, setMonitor] = useState(false);
   const [consistency, setConsistency] = useState(false);
@@ -50,6 +51,8 @@ export const ClusterFeatureModal = ({ visible, data, close }: { visible: any, da
   const [secretId, setSecretId] = useState('');
   const [secretKey, setSecretKey] = useState('');
   const [path, setPath] = useState('');
+  const { t } = useTranslation();
+
   // load info
   useEffect(() => {
     (async () => {
@@ -63,10 +66,12 @@ export const ClusterFeatureModal = ({ visible, data, close }: { visible: any, da
 
         if (data.metadata.labels.backup === 'true') {
           const backupValue = JSON.parse(
-            data?.metadata?.annotations?.backup ?? '{}'
+            data?.metadata?.annotations?.backup ?? '{}',
           );
           const res = await http.get(`/apis/secrets/cos-${data.metadata.name}`);
-          setBackupIntervalInSecond(backupValue?.backupPolicy?.backupIntervalInSecond);
+          setBackupIntervalInSecond(
+            backupValue?.backupPolicy?.backupIntervalInSecond,
+          );
           setMaxBackups(backupValue?.backupPolicy?.maxBackups);
           setTimeoutInSecond(backupValue?.backupPolicy?.timeoutInSecond);
           setSecretId(decode(res?.data?.data['secret-id'] ?? ''));
@@ -149,97 +154,111 @@ export const ClusterFeatureModal = ({ visible, data, close }: { visible: any, da
   };
 
   return (
-    <Modal visible={visible} title='集群功能项' onCancel={close} onOk={onFinish}>
+    <Modal
+      visible={visible}
+      title={t('ClusterFeature')}
+      onCancel={close}
+      onOk={onFinish}
+    >
       <Spin spinning={isLoading}>
-        <Card title='功能项开关'>
-          <Form
-            name='form'
-            layout='inline' >
-            <Form.Item label='Monitor'>
-              <Switch key='Monitor' checked={monitor} onChange={(value: boolean) => setMonitor(value)} />
+        <Card title={t('FeatureGates')}>
+          <Form name="form" layout="inline">
+            <Form.Item label="Monitor">
+              <Switch
+                key="Monitor"
+                checked={monitor}
+                onChange={(value: boolean) => setMonitor(value)}
+              />
             </Form.Item>
-            <Form.Item label='Consistency'>
-              <Switch key='Consistency' checked={consistency} onChange={(value: boolean) => setConsistency(value)} />
+            <Form.Item label="Consistency">
+              <Switch
+                key="Consistency"
+                checked={consistency}
+                onChange={(value: boolean) => setConsistency(value)}
+              />
             </Form.Item>
-            <Form.Item label='Healthy'>
-              <Switch key='Healthy' checked={healthy} onChange={(value: boolean) => setHealthy(value)} />
+            <Form.Item label="Healthy">
+              <Switch
+                key="Healthy"
+                checked={healthy}
+                onChange={(value: boolean) => setHealthy(value)}
+              />
             </Form.Item>
-            <Form.Item label='Request'>
-              <Switch key='Request' checked={request} onChange={(value: boolean) => setRequest(value)} />
+            <Form.Item label="Request">
+              <Switch
+                key="Request"
+                checked={request}
+                onChange={(value: boolean) => setRequest(value)}
+              />
             </Form.Item>
-            <Form.Item label='Backup'>
-              <Switch key='Backup' checked={backup} onChange={(value: boolean) => setBackup(value)} />
+            <Form.Item label="Backup">
+              <Switch
+                key="Backup"
+                checked={backup}
+                onChange={(value: boolean) => setBackup(value)}
+              />
             </Form.Item>
           </Form>
         </Card>
-        {
-          backup ? (
-            <Card title='Backup参数设置' style={{ marginTop: '10px' }}>
-              <Form name='backup' {...formItemLayout}>
-                <Form.Item
-                  label='BackupIntervalInSecond'
-                  required
-                >
-                  <InputNumber
-                    min={0}
-                    value={backupIntervalInSecond}
-                    onChange={(e: any) => setBackupIntervalInSecond(e.target.value)} />
-                </Form.Item>
-                <Form.Item
-                  label='MaxBackups'
-                  required
-                >
-                  <InputNumber min={0} value={maxBackups} onChange={(e: any) => setMaxBackups(e.target.value)} />
-                </Form.Item>
-                <Form.Item
-                  label='TimeoutInSecond'
-                  required
-                >
-                  <InputNumber
-                    min={0}
-                    value={timeoutInSecond}
-                    onChange={(e: any) => setTimeoutInSecond(e.target.value)} />
-                </Form.Item>
-                <Form.Item
-                  label='SecretId'
-                  required
-                >
-                  <Input
-                    placeholder='请输入'
-                    autoComplete='off'
-                    spellCheck={false}
-                    value={secretId}
-                    onChange={(e: any) => setSecretId(e.target.value)}
-                  />
-                </Form.Item>
-                <Form.Item
-                  label='SecretKey'
-                  required
-                >
-                  <Input
-                    placeholder='请输入'
-                    autoComplete='off'
-                    spellCheck={false}
-                    value={secretKey}
-                    onChange={(e: any) => setSecretKey(e.target.value)}
-                  />
-                </Form.Item>
-                <Form.Item
-                  label='Path'
-                  required
-                >
-                  <Input
-                    placeholder='请输入'
-                    autoComplete='off'
-                    spellCheck={false}
-                    value={path}
-                    onChange={(e: any) => setPath(e.target.value)}
-                  />
-                </Form.Item>
-              </Form>
-            </Card>
-          ) : null
-        }
+        {backup ? (
+          <Card
+            title={t('BackupParameterSettings')}
+            style={{ marginTop: '10px' }}
+          >
+            <Form name="backup" {...formItemLayout}>
+              <Form.Item label="BackupIntervalInSecond" required>
+                <InputNumber
+                  min={0}
+                  value={backupIntervalInSecond}
+                  onChange={(e: any) =>
+                    setBackupIntervalInSecond(e.target.value)
+                  }
+                />
+              </Form.Item>
+              <Form.Item label="MaxBackups" required>
+                <InputNumber
+                  min={0}
+                  value={maxBackups}
+                  onChange={(e: any) => setMaxBackups(e.target.value)}
+                />
+              </Form.Item>
+              <Form.Item label="TimeoutInSecond" required>
+                <InputNumber
+                  min={0}
+                  value={timeoutInSecond}
+                  onChange={(e: any) => setTimeoutInSecond(e.target.value)}
+                />
+              </Form.Item>
+              <Form.Item label="SecretId" required>
+                <Input
+                  placeholder={t('PleaseInput')}
+                  autoComplete="off"
+                  spellCheck={false}
+                  value={secretId}
+                  onChange={(e: any) => setSecretId(e.target.value)}
+                />
+              </Form.Item>
+              <Form.Item label="SecretKey" required>
+                <Input
+                  placeholder={t('PleaseInput')}
+                  autoComplete="off"
+                  spellCheck={false}
+                  value={secretKey}
+                  onChange={(e: any) => setSecretKey(e.target.value)}
+                />
+              </Form.Item>
+              <Form.Item label="Path" required>
+                <Input
+                  placeholder={t('PleaseInput')}
+                  autoComplete="off"
+                  spellCheck={false}
+                  value={path}
+                  onChange={(e: any) => setPath(e.target.value)}
+                />
+              </Form.Item>
+            </Form>
+          </Card>
+        ) : null}
       </Spin>
     </Modal>
   );
