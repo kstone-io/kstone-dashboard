@@ -1,6 +1,6 @@
 {
   "Cluster": "Cluster",
-  "HasNotYetEnabledTheBackupFeature": " has not yet enabled the backup feature",
+  "HasNotYetEnabledTheBackupFeature": "has not yet enabled the backup feature",
   "Core": "Core",
   "PleaseCheckTheNetworkOrContactTheAdministrator": "please check the network or contact the administrator",
   "BackupParameterSettings": "Backup Parameter Settings",
@@ -17,7 +17,7 @@
   "EnvironmentVariableName": "Environment Variable Name",
   "EnvironmentVariableValue": "Environment Variable Value",
   "EnvironmentVariableConfiguration": "Environment Variable Configuration",
-  "HasNotYetEnabledTheMonitorFeature": " has not yet enabled the monitor feature",
+  "HasNotYetEnabledTheMonitorFeature": "has not yet enabled the monitor feature",
   "Create": "Create",
   "DiskSize": "Disk size",
   "DiskType": "Disk type",

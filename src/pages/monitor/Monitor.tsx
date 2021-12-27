@@ -118,7 +118,7 @@ export function Monitor(): JSX.Element {
                   style={{ height: '100%' }}
                   description={`${t(
                     'Cluster',
-                  )}${clusterName}${'HasNotYetEnabledTheMonitorFeature'}`}
+                  )} ${clusterName} ${t('HasNotYetEnabledTheMonitorFeature')}`}
                 />
               }
             </>
