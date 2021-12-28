@@ -285,7 +285,7 @@ export function Create(): JSX.Element {
                   href="https://etcd.io/docs/v3.4/op-guide/configuration/"
                   target="_blank"
                 >
-                  etcd环境变量配置?
+                  {t('EtcdEnvironmentConfigurations')}
                 </Typography.Link>
               </List.Item>
             </List>

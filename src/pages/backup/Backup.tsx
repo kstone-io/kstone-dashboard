@@ -160,9 +160,9 @@ export function Backup(): JSX.Element {
         </Header>
         {backupInfo === undefined ? (
           <Empty
-            description={`{${t('Cluster')}${clusterName}${t(
+            description={`${t('Cluster')} ${clusterName} ${t(
               'HasNotYetEnabledTheBackupFeature',
-            )}}`}
+            )}`}
           />
         ) : (
           <Table

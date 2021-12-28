@@ -121,7 +121,7 @@ export function Cluster(): JSX.Element {
       render: (cluster: any) => (
         <>
           <p>
-            {cluster.spec.totalCpu}核 {cluster.spec.totalMem}GB
+            {cluster.spec.totalCpu}{t('Core')} {cluster.spec.totalMem}GB
           </p>
         </>
       ),
@@ -215,7 +215,7 @@ export function Cluster(): JSX.Element {
                 window.location.href = '/cluster/add';
               }}
             >
-              {t('AssociatedCluster')}
+              {t('ImortCluster')}
             </Button>
             <Button
               type="primary"

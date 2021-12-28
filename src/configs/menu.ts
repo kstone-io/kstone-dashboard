@@ -32,7 +32,7 @@ export const menu: AppMenu = {
         {
           key: 'addCluster',
           route: '/cluster/add',
-          title: i18n.t('AssociatedCluster'),
+          title: i18n.t('ImortCluster'),
         },
         {
           key: 'cluster',

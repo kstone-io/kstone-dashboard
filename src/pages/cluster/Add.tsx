@@ -57,7 +57,7 @@ export function Add(): JSX.Element {
       value: '',
     },
   ]);
-  const title = t('AssociatedCluster');
+  const title = t('ImortCluster');
 
   // get form
   const [form] = Form.useForm();

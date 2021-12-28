@@ -211,7 +211,7 @@ export const ClusterFeatureModal = ({
                   min={0}
                   value={backupIntervalInSecond}
                   onChange={(e: any) =>
-                    setBackupIntervalInSecond(e.target.value)
+                    setBackupIntervalInSecond(e)
                   }
                 />
               </Form.Item>
@@ -219,14 +219,14 @@ export const ClusterFeatureModal = ({
                 <InputNumber
                   min={0}
                   value={maxBackups}
-                  onChange={(e: any) => setMaxBackups(e.target.value)}
+                  onChange={(e: any) => setMaxBackups(e)}
                 />
               </Form.Item>
               <Form.Item label="TimeoutInSecond" required>
                 <InputNumber
                   min={0}
                   value={timeoutInSecond}
-                  onChange={(e: any) => setTimeoutInSecond(e.target.value)}
+                  onChange={(e: any) => setTimeoutInSecond(e)}
                 />
               </Form.Item>
               <Form.Item label="SecretId" required>
