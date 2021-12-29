@@ -86,15 +86,15 @@ export function Cluster(): JSX.Element {
       width: 100,
       render: (cluster: any) => {
         if (cluster.status === undefined) {
-          return <Tag>Unknown</Tag>;
+          return <Tag style={{ marginBottom: '14px' }}>Unknown</Tag>;
         }
         if (cluster.status.phase === 'Running') {
-          return <Tag color="green">{t('Normal')}</Tag>;
+          return <Tag color="green" style={{ marginBottom: '14px' }}>{t('Normal')}</Tag>;
         }
         if (cluster.status.phase === 'stopped') {
-          return <Tag color="green">{t('NorExceptionmal')}</Tag>;
+          return <Tag color="green" style={{ marginBottom: '14px' }}>{t('NorExceptionmal')}</Tag>;
         }
-        return <Tag>{cluster.status.phase}</Tag>;
+        return <Tag style={{ marginBottom: '14px' }}>{cluster.status.phase}</Tag>;
       },
     },
     {
@@ -150,7 +150,7 @@ export function Cluster(): JSX.Element {
           </Menu>
         );
         return (
-          <>
+          <div style={{ marginBottom: '14px' }}>
             <Dropdown overlay={dropDownMenu}>
               <a
                 href="/#"
@@ -169,7 +169,7 @@ export function Cluster(): JSX.Element {
             >
               {t('Delete')}
             </Button>
-          </>
+          </div>
         );
       },
     },
