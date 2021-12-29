@@ -34,6 +34,7 @@ import { PlusOutlined, MinusOutlined } from '@ant-design/icons';
 import http from 'src/utils/http';
 import { encode } from 'js-base64';
 import { useTranslation } from 'react-i18next';
+import { GenerateOwnerReferences } from 'src/utils/common';
 
 const { Header, Content } = Layout;
 const { Text } = Typography;
@@ -59,14 +60,8 @@ export function Add(): JSX.Element {
   ]);
   const title = t('ImortCluster');
 
-  // get form
-  const [form] = Form.useForm();
-  // handle finish
-  const onFinish = async (values: any) => {
-    let certName = '';
-    // handle https
+  const ensureSecret = async (values: any, clusterUID: string) => {
     if (values.scheme === 'https') {
-      certName = `kstone/${values.name}`;
       // init etcd secret
       const secret: any = {
         apiVersion: 'v1',
@@ -79,6 +74,7 @@ export function Add(): JSX.Element {
         metadata: {
           name: values.name,
           namespace: 'kstone',
+          ownerReferences: GenerateOwnerReferences(values.name, clusterUID),
         },
         type: 'Opaque',
       };
@@ -92,6 +88,18 @@ export function Add(): JSX.Element {
         sleep(2000);
         return;
       }
+    }
+    window.location.href = '/cluster';
+  };
+
+  // get form
+  const [form] = Form.useForm();
+  // handle finish
+  const onFinish = async (values: any) => {
+    let certName = '';
+    // handle https
+    if (values.scheme === 'https') {
+      certName = `kstone/${values.name}`;
     }
     // transfer memberList to extClientURL
     let extClientURL = '';
@@ -139,7 +147,7 @@ export function Add(): JSX.Element {
     // post cluster
     http.post('/apis/etcdclusters', data).then((resp) => {
       if (resp.statusText === 'Created') {
-        window.location.href = '/cluster';
+        ensureSecret(values, resp.data.metadata.uid);
       } else {
         // handle error
         message.error({

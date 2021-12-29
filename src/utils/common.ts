@@ -87,3 +87,15 @@ export function FormatBytes(a: number, b: number): string {
     f = Math.floor(Math.log(a) / Math.log(c));
   return parseFloat((a / Math.pow(c, f)).toFixed(d)) + ' ' + e[f];
 }
+
+// GenerateOwnerReferences generates ownerReferences by etcdName
+export function GenerateOwnerReferences(etcdName: string, uid: string): any {
+  return [
+    {
+      apiVersion: 'kstone.tkestack.io/v1alpha1',
+      kind: 'EtcdCluster',
+      name: etcdName,
+      uid: uid,
+    }
+  ];
+}

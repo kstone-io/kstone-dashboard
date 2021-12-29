@@ -258,6 +258,7 @@ export function Cluster(): JSX.Element {
         >
           {t('AreYouSureToDeleteTheCluster')}
           <Text type="danger">{cluster.metadata.name}</Text>
+          ?
         </Modal>
       ) : null}
       {visible ? (

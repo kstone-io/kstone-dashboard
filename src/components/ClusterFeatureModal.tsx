@@ -22,6 +22,7 @@ import * as _ from 'lodash';
 import http from 'src/utils/http';
 import { encode, decode } from 'js-base64';
 import { useTranslation } from 'react-i18next';
+import { GenerateOwnerReferences } from 'src/utils/common';
 // form style
 const formItemLayout = {
   labelCol: { span: 10 },
@@ -136,6 +137,7 @@ export const ClusterFeatureModal = ({
       metadata: {
         name: `cos-${data.metadata.name}`,
         namespace: 'kstone',
+        ownerReferences: GenerateOwnerReferences(data.metadata.name, data.metadata.uid),
       },
       type: 'Opaque',
     };
