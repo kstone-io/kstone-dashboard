@@ -42,7 +42,7 @@ const { TextArea } = Input;
 const MappingSymbol = '->';
 // form style
 const formItemLayout = {
-  labelCol: { span: 3 },
+  labelCol: { span: 4 },
   wrapperCol: { span: 6 },
 };
 const sleep = (ms: any) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -234,7 +234,7 @@ export function Add(): JSX.Element {
             <List style={{ marginTop: '0px', paddingTop: '0px' }}>
               {memberList.map((item, i) => {
                 return (
-                  <List.Item key={i}>
+                  <List.Item key={i} style={{ paddingTop: '0px' }}>
                     <Input
                       value={item.key}
                       onChange={(e) => {
