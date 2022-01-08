@@ -23,6 +23,7 @@ import http from 'src/utils/http';
 import { encode, decode } from 'js-base64';
 import { useTranslation } from 'react-i18next';
 import { GenerateOwnerReferences } from 'src/utils/common';
+
 // form style
 const formItemLayout = {
   labelCol: { span: 10 },
@@ -41,11 +42,6 @@ export const ClusterFeatureModal = ({
   close: any;
 }): JSX.Element => {
   const [isLoading, setIsLoading] = useState(false);
-  const [monitor, setMonitor] = useState(false);
-  const [consistency, setConsistency] = useState(false);
-  const [healthy, setHealthy] = useState(false);
-  const [request, setRequest] = useState(false);
-  const [backup, setBackup] = useState(false);
   const [backupIntervalInSecond, setBackupIntervalInSecond] = useState(3600);
   const [maxBackups, setMaxBackups] = useState(72);
   const [timeoutInSecond, setTimeoutInSecond] = useState(600);
@@ -53,35 +49,48 @@ export const ClusterFeatureModal = ({
   const [secretKey, setSecretKey] = useState('');
   const [path, setPath] = useState('');
   const { t } = useTranslation();
+  const [featureMap, setFeatureMap] = useState({} as any);
+
+  const generateFeatureAnnotation = (): string => {
+    let result = '';
+    Object.keys(featureMap).sort().map((feature: string) => {
+      result += `${feature}=${featureMap[feature].toString()},`;
+      return feature;
+    });
+    return result.substring(0, result.lastIndexOf(','));
+  };
 
   // load info
   useEffect(() => {
-    (async () => {
-      if (data?.metadata?.labels) {
-        setIsLoading(true);
-        setMonitor(data.metadata.labels.monitor === 'true');
-        setConsistency(data.metadata.labels.consistency === 'true');
-        setHealthy(data.metadata.labels.healthy === 'true');
-        setRequest(data.metadata.labels.request === 'true');
-        setBackup(data.metadata.labels.backup === 'true');
+    setIsLoading(true);
+    http.get('/apis/features').then(featureResp => {
+      (async () => {
+        if (data?.metadata?.labels) {
+          const map: any = {};
+          featureResp.data.map((item: string) => {
+            map[item] = (data.metadata.labels[item] === 'true');
+            return item;
+          });
+          setFeatureMap(map);
 
-        if (data.metadata.labels.backup === 'true') {
-          const backupValue = JSON.parse(
-            data?.metadata?.annotations?.backup ?? '{}',
-          );
-          const res = await http.get(`/apis/secrets/cos-${data.metadata.name}`);
-          setBackupIntervalInSecond(
-            backupValue?.backupPolicy?.backupIntervalInSecond,
-          );
-          setMaxBackups(backupValue?.backupPolicy?.maxBackups);
-          setTimeoutInSecond(backupValue?.backupPolicy?.timeoutInSecond);
-          setSecretId(decode(res?.data?.data['secret-id'] ?? ''));
-          setSecretKey(decode(res?.data?.data['secret-key'] ?? ''));
-          setPath(backupValue?.cos?.path);
+          if (data.metadata.labels.backup === 'true') {
+            const backupValue = JSON.parse(
+              data?.metadata?.annotations?.backup ?? '{}',
+            );
+            const res = await http.get(`/apis/secrets/cos-${data.metadata.name}`);
+            setBackupIntervalInSecond(
+              backupValue?.backupPolicy?.backupIntervalInSecond,
+            );
+            setMaxBackups(backupValue?.backupPolicy?.maxBackups);
+            setTimeoutInSecond(backupValue?.backupPolicy?.timeoutInSecond);
+            setSecretId(decode(res?.data?.data['secret-id'] ?? ''));
+            setSecretKey(decode(res?.data?.data['secret-key'] ?? ''));
+            setPath(backupValue?.cos?.path);
+          }
+          setIsLoading(false);
         }
-        setIsLoading(false);
-      }
-    })();
+      })();
+    });
   }, [data]);
   // handle finish
   const onFinish = async () => {
@@ -101,7 +110,7 @@ export const ClusterFeatureModal = ({
   // update feature gates setting
   const updateCluster = async (values?: any) => {
     const model = _.cloneDeep(data);
-    if (values && backup) {
+    if (values && featureMap['backup']) {
       const backup = `
 {
   "backupPolicy": {
@@ -118,13 +127,13 @@ export const ClusterFeatureModal = ({
       `;
       model.metadata.annotations.backup = backup;
     }
-    const gates = `monitor=${monitor.toString()},consistency=${consistency.toString()},healthy=${healthy.toString()},request=${request.toString()},backup=${backup.toString()}`;
+    const gates = generateFeatureAnnotation();
     model.metadata.annotations[FeatureGatesKey] = gates;
     await http.put(`/apis/etcdclusters/${data.metadata.name}`, model);
   };
   // create secret for cos
   const createSecret = async (values: any) => {
-    if (!backup) {
+    if (!featureMap['backup']) {
       return;
     }
     const model = {
@@ -165,44 +174,26 @@ export const ClusterFeatureModal = ({
       <Spin spinning={isLoading}>
         <Card title={t('FeatureGates')}>
           <Form name="form" layout="inline">
-            <Form.Item label="Monitor">
-              <Switch
-                key="Monitor"
-                checked={monitor}
-                onChange={(value: boolean) => setMonitor(value)}
-              />
-            </Form.Item>
-            <Form.Item label="Consistency">
-              <Switch
-                key="Consistency"
-                checked={consistency}
-                onChange={(value: boolean) => setConsistency(value)}
-              />
-            </Form.Item>
-            <Form.Item label="Healthy">
-              <Switch
-                key="Healthy"
-                checked={healthy}
-                onChange={(value: boolean) => setHealthy(value)}
-              />
-            </Form.Item>
-            <Form.Item label="Request">
-              <Switch
-                key="Request"
-                checked={request}
-                onChange={(value: boolean) => setRequest(value)}
-              />
-            </Form.Item>
-            <Form.Item label="Backup">
-              <Switch
-                key="Backup"
-                checked={backup}
-                onChange={(value: boolean) => setBackup(value)}
-              />
-            </Form.Item>
+            {
+              Object.keys(featureMap).sort().map((feature: string) => {
+                console.log(feature);
+                return <Form.Item style={{ textTransform: 'capitalize' }} label={feature}>
+                  <Switch
+                    key={feature}
+                    checked={featureMap[feature]}
+                    onChange={(value: boolean) => {
+                      featureMap[feature] = value;
+                      setFeatureMap({
+                        ...featureMap
+                      });
+                    }}
+                  />
+                </Form.Item>;
+              })
+            }
           </Form>
         </Card>
-        {backup ? (
+        {featureMap['backup'] ? (
           <Card
             title={t('BackupParameterSettings')}
             style={{ marginTop: '10px' }}
