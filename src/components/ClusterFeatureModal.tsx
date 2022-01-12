@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations under the License.
  */
 
-import { Modal, Form, Card, Input, Switch, Spin, InputNumber } from 'antd';
+import { Modal, Form, Card, Input, Switch, Spin, InputNumber, Row, Col } from 'antd';
 import { useEffect, useState } from 'react';
 import * as _ from 'lodash';
 import http from 'src/utils/http';
@@ -174,23 +174,27 @@ export const ClusterFeatureModal = ({
       <Spin spinning={isLoading}>
         <Card title={t('FeatureGates')}>
           <Form name="form" layout="inline">
-            {
-              Object.keys(featureMap).sort().map((feature: string) => {
-                console.log(feature);
-                return <Form.Item style={{ textTransform: 'capitalize' }} label={feature}>
-                  <Switch
-                    key={feature}
-                    checked={featureMap[feature]}
-                    onChange={(value: boolean) => {
-                      featureMap[feature] = value;
-                      setFeatureMap({
-                        ...featureMap
-                      });
-                    }}
-                  />
-                </Form.Item>;
-              })
-            }
+            <Row gutter={1}>
+              {
+                Object.keys(featureMap).sort().map((feature: string) => {
+                  console.log(feature);
+                  return <Col span={8}>
+                    <Form.Item style={{ textTransform: 'capitalize' }} label={feature}>
+                      <Switch
+                        key={feature}
+                        checked={featureMap[feature]}
+                        onChange={(value: boolean) => {
+                          featureMap[feature] = value;
+                          setFeatureMap({
+                            ...featureMap
+                          });
+                        }}
+                      />
+                    </Form.Item>
+                  </Col>;
+                })
+              }
+            </Row>
           </Form>
         </Card>
         {featureMap['backup'] ? (
