@@ -43,7 +43,7 @@ const MappingSymbol = '=';
 const GlobalConfig = 'etcd-version-global-config';
 // form style
 const formItemLayout = {
-  labelCol: { span: 3 },
+  labelCol: { span: 6 },
   wrapperCol: { span: 6 },
 };
 
@@ -227,7 +227,7 @@ export function Create(): JSX.Element {
             <List style={{ marginTop: '0px', paddingTop: '0px' }}>
               {envList.map((item, i) => {
                 return (
-                  <List.Item key={i}>
+                  <List.Item key={i} style={{ paddingTop: '0px' }}>
                     <Input
                       value={item.name}
                       onChange={(e) => {
@@ -302,7 +302,7 @@ export function Create(): JSX.Element {
           </Form.Item>
           <Form.Item wrapperCol={{ span: 12 }}>
             <Button type="primary" htmlType="submit">
-              提交
+              {t('Submit')}
             </Button>
           </Form.Item>
         </Form>

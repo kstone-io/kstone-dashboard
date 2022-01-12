@@ -68,7 +68,7 @@
   "PleaseSelectEtcdCluster": "Please select etcd cluster",
   "ConfirmDelete": "Confirm delete",
   "FailedToCreateSecret": "Failed to create secret",
-  "AreYouSureToDeleteTheCluster": "Are you sure to delete the cluster?",
+  "AreYouSureToDeleteTheCluster": "Are you sure to delete the cluster ",
   "Delete": "Delete",
   "TheInputNameDoesNotMeetTheRulesPleaseReferToTheRegularRules": "The input name does not meet the rules, please refer to the regular rules:",
   "SearchViewKeyValueData": "Search: View Key-Value Data",

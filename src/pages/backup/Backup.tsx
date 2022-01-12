@@ -140,8 +140,14 @@ export function Backup(): JSX.Element {
         }}
       >
         <Header className="site-layout-background" style={{ padding: '0px' }}>
-          <span>{t('ChooseCluster')}</span>
+          <Text
+            strong
+            style={{ float: 'left', marginLeft: '15px', marginRight: '15px' }}
+          >
+            {t('ChooseCluster')}:
+          </Text>
           <Select
+            style={{ minWidth: '150px' }}
             value={clusterName}
             onChange={(value) => selectCluster(value)}
             placeholder={t('PleaseSelectEtcdCluster')}

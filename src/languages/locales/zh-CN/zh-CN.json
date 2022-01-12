@@ -68,7 +68,7 @@
   "PleaseSelectEtcdCluster": "请选择etcd集群",
   "ConfirmDelete": "确认删除",
   "FailedToCreateSecret": "Secret创建失败",
-  "AreYouSureToDeleteTheCluster": "确定删除集群?",
+  "AreYouSureToDeleteTheCluster": "确定删除集群 ",
   "Delete": "删除",
   "TheInputNameDoesNotMeetTheRulesPleaseReferToTheRegularRules": "输入名称不符合规则，请参考正则: ",
   "SearchViewKeyValueData": "搜索：查看Key-Value数据",

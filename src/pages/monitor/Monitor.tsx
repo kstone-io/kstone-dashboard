@@ -62,10 +62,10 @@ export function Monitor(): JSX.Element {
           strong
           style={{ float: 'left', marginLeft: '15px', marginRight: '15px' }}
         >
-          {t('ClusterMonitor')}
+          {t('ClusterMonitor')}:
         </Text>
         <Select
-          style={{ marginTop: '5px' }}
+          style={{ marginTop: '5px', minWidth: '150px' }}
           options={clusterList.map((item: any) => ({
             value: item.metadata.name,
             text: item.metadata.name,

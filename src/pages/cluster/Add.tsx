@@ -34,6 +34,7 @@ import { PlusOutlined, MinusOutlined } from '@ant-design/icons';
 import http from 'src/utils/http';
 import { encode } from 'js-base64';
 import { useTranslation } from 'react-i18next';
+import { GenerateOwnerReferences } from 'src/utils/common';
 
 const { Header, Content } = Layout;
 const { Text } = Typography;
@@ -42,7 +43,7 @@ const { TextArea } = Input;
 const MappingSymbol = '->';
 // form style
 const formItemLayout = {
-  labelCol: { span: 3 },
+  labelCol: { span: 4 },
   wrapperCol: { span: 6 },
 };
 const sleep = (ms: any) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -59,14 +60,8 @@ export function Add(): JSX.Element {
   ]);
   const title = t('ImortCluster');
 
-  // get form
-  const [form] = Form.useForm();
-  // handle finish
-  const onFinish = async (values: any) => {
-    let certName = '';
-    // handle https
+  const ensureSecret = async (values: any, clusterUID: string) => {
     if (values.scheme === 'https') {
-      certName = `kstone/${values.name}`;
       // init etcd secret
       const secret: any = {
         apiVersion: 'v1',
@@ -79,6 +74,7 @@ export function Add(): JSX.Element {
         metadata: {
           name: values.name,
           namespace: 'kstone',
+          ownerReferences: GenerateOwnerReferences(values.name, clusterUID),
         },
         type: 'Opaque',
       };
@@ -92,6 +88,18 @@ export function Add(): JSX.Element {
         sleep(2000);
         return;
       }
+    }
+    window.location.href = '/cluster';
+  };
+
+  // get form
+  const [form] = Form.useForm();
+  // handle finish
+  const onFinish = async (values: any) => {
+    let certName = '';
+    // handle https
+    if (values.scheme === 'https') {
+      certName = `kstone/${values.name}`;
     }
     // transfer memberList to extClientURL
     let extClientURL = '';
@@ -139,7 +147,7 @@ export function Add(): JSX.Element {
     // post cluster
     http.post('/apis/etcdclusters', data).then((resp) => {
       if (resp.statusText === 'Created') {
-        window.location.href = '/cluster';
+        ensureSecret(values, resp.data.metadata.uid);
       } else {
         // handle error
         message.error({
@@ -234,7 +242,7 @@ export function Add(): JSX.Element {
             <List style={{ marginTop: '0px', paddingTop: '0px' }}>
               {memberList.map((item, i) => {
                 return (
-                  <List.Item key={i}>
+                  <List.Item key={i} style={{ paddingTop: '0px' }}>
                     <Input
                       value={item.key}
                       onChange={(e) => {
