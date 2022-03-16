@@ -34,7 +34,7 @@ import { PlusOutlined, MinusOutlined } from '@ant-design/icons';
 import http from 'src/utils/http';
 import { encode } from 'js-base64';
 import { useTranslation } from 'react-i18next';
-import { GenerateOwnerReferences } from 'src/utils/common';
+import { GenerateOwnerReferences, APIVersion } from 'src/utils/common';
 
 const { Header, Content } = Layout;
 const { Text } = Typography;
@@ -114,7 +114,7 @@ export function Add(): JSX.Element {
     }
     // init cluster info
     const data = {
-      apiVersion: 'kstone.tkestack.io/v1alpha1',
+      apiVersion: APIVersion,
       kind: 'EtcdCluster',
       metadata: {
         annotations: {

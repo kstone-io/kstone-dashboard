@@ -92,10 +92,13 @@ export function FormatBytes(a: number, b: number): string {
 export function GenerateOwnerReferences(etcdName: string, uid: string): any {
   return [
     {
-      apiVersion: 'kstone.tkestack.io/v1alpha1',
+      apiVersion: APIVersion,
       kind: 'EtcdCluster',
       name: etcdName,
       uid: uid,
     }
   ];
 }
+
+// APIVersion
+export const APIVersion = 'kstone.tkestack.io/v1alpha2';

@@ -34,6 +34,7 @@ import {
 import { PlusOutlined, MinusOutlined } from '@ant-design/icons';
 import http from 'src/utils/http';
 import { useTranslation } from 'react-i18next';
+import { APIVersion } from 'src/utils/common';
 
 const { Header, Content } = Layout;
 const { Text } = Typography;
@@ -82,7 +83,7 @@ export function Create(): JSX.Element {
     }
     // init cluster info
     const data: any = {
-      apiVersion: 'kstone.tkestack.io/v1alpha1',
+      apiVersion: APIVersion,
       kind: 'EtcdCluster',
       metadata: {
         annotations: {
