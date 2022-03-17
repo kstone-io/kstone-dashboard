@@ -80,9 +80,12 @@
   "ChooseCluster": "选择集群：",
   "Exception": "异常",
   "Forkubernetes": "用于Kubernetes",
+  "AuthEnable": "开启鉴权",
   "OperationCenter": "运维中心",
   "Normal": "正常",
   "Status": "状态",
   "StatusDescription": "状态描述",
-  "LastUpdateTime": "最后更新时间"
+  "LastUpdateTime": "最后更新时间",
+  "User": "用户",
+  "Password": "密码"
 }

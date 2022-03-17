@@ -80,9 +80,12 @@
   "ChooseCluster": "Choose Cluster",
   "Exception": "Exception",
   "Forkubernetes": "For Kubernetes",
+  "AuthEnable": "Auth Enable",
   "OperationCenter": "Operation Center",
   "Normal": "Normal",
   "Status": "Status",
   "StatusDescription": "Status Description",
-  "LastUpdateTime": "Last update time"
+  "LastUpdateTime": "Last update time",
+  "User": "User",
+  "Password": "Password"
 }
