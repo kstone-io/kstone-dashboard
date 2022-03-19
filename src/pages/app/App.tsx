@@ -28,27 +28,32 @@ import { menu } from 'src/configs/menu';
 import { Visualization } from 'src/pages/visualization';
 import { Monitor } from 'src/pages/monitor';
 import { Backup } from 'src/pages/backup';
+import { Login, ResetPassword } from 'src/pages/login';
 
 import './App.css';
 
 function App(): JSX.Element {
-  const mainRoutes = {
-    path: '/',
-    element: <Layout menu={menu} />,
-    children: [
-      { path: '*', element: <Navigate to="/404" /> },
-      { path: '/', element: <Cluster /> },
-      { path: 'cluster', element: <Cluster /> },
-      { path: 'cluster/add', element: <AddCluster /> },
-      { path: 'cluster/create', element: <CreateCluster /> },
-      { path: 'cluster/:name', element: <UpdateCluster /> },
-      { path: 'visualization', element: <Visualization /> },
-      { path: 'monitor', element: <Monitor /> },
-      { path: 'backup', element: <Backup /> },
-    ],
-  };
+  const mainRoutes = [
+    {
+      path: '/',
+      element: <Layout menu={menu} />,
+      children: [
+        { path: '*', element: <Navigate to="/404" /> },
+        { path: '/', element: <Cluster /> },
+        { path: 'cluster', element: <Cluster /> },
+        { path: 'cluster/add', element: <AddCluster /> },
+        { path: 'cluster/create', element: <CreateCluster /> },
+        { path: 'cluster/:name', element: <UpdateCluster /> },
+        { path: 'visualization', element: <Visualization /> },
+        { path: 'monitor', element: <Monitor /> },
+        { path: 'backup', element: <Backup /> },
+      ],
+    },
+    { path: '/reset', element: <ResetPassword />},
+    { path: '/login', element: <Login /> }
+  ];
 
-  const routing = useRoutes([mainRoutes]);
+  const routing = useRoutes(mainRoutes);
   return <>{routing}</>;
 }
 

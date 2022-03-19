@@ -87,5 +87,12 @@
   "StatusDescription": "Status Description",
   "LastUpdateTime": "Last update time",
   "User": "User",
-  "Password": "Password"
+  "Password": "Password",
+  "Login": "Login",
+  "Logout": "Logout",
+  "ResetPassword": "Reset Password",
+  "ConfirmPassword": "Confirm Password",
+  "ConfirmPasswordMessage": "The two passwords that you entered do not match!",
+  "PasswordMessage": "Please input your password!",
+  "ConfirmMessage": "Please confirm your password!"
 }
