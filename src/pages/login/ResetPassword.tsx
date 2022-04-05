@@ -27,7 +27,6 @@ import {
 import { useState } from 'react';
 import { LockOutlined, UserOutlined, DownOutlined } from '@ant-design/icons';
 import http from 'src/utils/http';
-import cookies from 'src/utils/cookies';
 import logo from '../../../src/logo.png';
 import { useTranslation } from 'react-i18next';
 
