@@ -22,7 +22,9 @@ import {
   Menu,
   Button,
   Form,
-  Input
+  Input,
+  Image,
+  Typography
 } from 'antd';
 import { useState } from 'react';
 import { LockOutlined, UserOutlined, DownOutlined } from '@ant-design/icons';
@@ -32,6 +34,7 @@ import logo from '../../../src/logo.png';
 import { useTranslation } from 'react-i18next';
 
 const { Header, Content } = AntdLayout;
+const { Title } = Typography;
 
 const formLayout = {
   labelCol: { span: 6 },
@@ -95,6 +98,21 @@ export function Login(): JSX.Element {
           marginRight: 'auto',
           marginTop: '100px'
         }}>
+          <div style={{
+            width: '300px',
+            height: '200px',
+            marginLeft: 'auto',
+            marginRight: 'auto',
+            marginBottom: '50px',
+            textAlign: 'center'
+          }}>
+            <Image
+              width={200}
+              src='../../../logo.png'
+              preview={false}
+            />
+            <Title level={3}>Sign in to Kstone</Title>
+          </div>
           <Form name='login' {...formLayout} onFinish={handleSubmit}>
             <div className='form-item'>
               <Form.Item
@@ -102,7 +120,7 @@ export function Login(): JSX.Element {
                 rules={[
                   {
                     required: true,
-                    message: t('User'),
+                    message: t('UserMessage'),
                   },
                 ]}
               >
@@ -127,7 +145,7 @@ export function Login(): JSX.Element {
               <Form.Item shouldUpdate={true} style={{ marginBottom: 0 }}>
                 {() => (
                   <Button className='submit-btn' loading={loading} htmlType='submit'>
-                    {t('Login')}
+                    {t('SignIn')}
                   </Button>
                 )}
               </Form.Item>

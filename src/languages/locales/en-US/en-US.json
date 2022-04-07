@@ -86,7 +86,7 @@
   "Status": "Status",
   "StatusDescription": "Status Description",
   "LastUpdateTime": "Last update time",
-  "User": "User",
+  "User": "Username",
   "Password": "Password",
   "Login": "Login",
   "Logout": "Logout",
@@ -94,5 +94,9 @@
   "ConfirmPassword": "Confirm Password",
   "ConfirmPasswordMessage": "The two passwords that you entered do not match!",
   "PasswordMessage": "Please input your password!",
-  "ConfirmMessage": "Please confirm your password!"
+  "ConfirmMessage": "Please confirm your password!",
+  "PasswordStrengthMessage": "Password strength requires at least 8 characters in length and contains at least numbers, lowercase letters, uppercase letters, and special characters.",
+  "SignIn": "Sign in",
+  "SignOut": "Sign out",
+  "UserMessage": "Please input your username!"
 }

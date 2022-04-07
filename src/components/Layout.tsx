@@ -74,7 +74,7 @@ const Layout = ({ menu }: { menu: any }): JSX.Element => {
           <img src={logo} alt="logo" width="120px" />
           {
             cookies.get('token') !== '' ? <Button style={{ width: '100px', marginRight: '0', marginLeft: 'auto' }} type='link' block onClick={() => { handleLogout() }}>
-              {t('Logout')}
+              {t('SignOut')}
             </Button> : null
           }
           <Dropdown overlay={menus} trigger={['click', 'hover']}>

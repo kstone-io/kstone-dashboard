@@ -86,7 +86,7 @@
   "Status": "状态",
   "StatusDescription": "状态描述",
   "LastUpdateTime": "最后更新时间",
-  "User": "用户",
+  "User": "用户名",
   "Password": "密码",
   "Login": "登录",
   "Logout": "登出",
@@ -94,5 +94,9 @@
   "ConfirmPassword": "确认密码",
   "ConfirmPasswordMessage": "两次输入的密码不匹配！",
   "PasswordMessage": "请输入密码！",
-  "ConfirmMessage": "请确认密码！"
+  "ConfirmMessage": "请确认密码！",
+  "PasswordStrengthMessage": "密码强度要求长度至少8位，至少包含数字、小写字母、大写字母和特殊字符。",
+  "SignIn": "登入",
+  "SignOut": "登出",
+  "UserMessage": "请输入你的用户名！"
 }

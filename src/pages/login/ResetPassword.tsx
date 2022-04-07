@@ -22,7 +22,9 @@ import {
   Menu,
   Button,
   Form,
-  Input
+  Input,
+  Image,
+  Typography,
 } from 'antd';
 import { useState } from 'react';
 import { LockOutlined, UserOutlined, DownOutlined } from '@ant-design/icons';
@@ -31,6 +33,7 @@ import logo from '../../../src/logo.png';
 import { useTranslation } from 'react-i18next';
 
 const { Header, Content } = AntdLayout;
+const { Title } = Typography;
 
 const formLayout = {
   labelCol: { span: 6 },
@@ -90,8 +93,23 @@ export function ResetPassword(): JSX.Element {
           height: '500px',
           marginLeft: 'auto',
           marginRight: 'auto',
-          marginTop: '100px'
+          marginTop: '50px'
         }}>
+          <div style={{
+            width: '300px',
+            height: '200px',
+            marginLeft: 'auto',
+            marginRight: 'auto',
+            marginBottom: '50px',
+            textAlign: 'center'
+          }}>
+            <Image
+              width={200}
+              src='../../../logo.png'
+              preview={false}
+            />
+            <Title level={3}>Reset your password</Title>
+          </div>
           <Form name='login' {...formLayout} onFinish={handleSubmit}>
             <div className='form-item'>
               <Form.Item
@@ -99,7 +117,7 @@ export function ResetPassword(): JSX.Element {
                 rules={[
                   {
                     required: true,
-                    message: t('User'),
+                    message: t('UserMessage'),
                   },
                 ]}
               >
@@ -114,6 +132,15 @@ export function ResetPassword(): JSX.Element {
                     required: true,
                     message: t('PasswordMessage'),
                   },
+                  () => ({
+                    validator(_, value) {
+                      const strongPasswordRegx = new RegExp("^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[~!@#$%^&*])(?=.{8,})");
+                      if (value.length > 0 && !strongPasswordRegx.test(value)) {
+                        return Promise.reject(t('PasswordStrengthMessage'));
+                      }
+                      return Promise.resolve();
+                    },
+                  }),
                 ]}
                 hasFeedback
               >
@@ -136,7 +163,7 @@ export function ResetPassword(): JSX.Element {
                       }
                       return Promise.reject(new Error(t('ConfirmPasswordMessage')));
                     },
-                  }),
+                  })
                 ]}
                 hasFeedback
               >
