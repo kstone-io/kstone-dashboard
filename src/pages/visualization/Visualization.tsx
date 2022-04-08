@@ -30,8 +30,8 @@ import {
 } from 'antd';
 import MonacoEditor from 'react-monaco-editor';
 import 'antd/dist/antd.css';
-import axios from 'axios';
 import { useTranslation } from 'react-i18next';
+import http from 'src/utils/http';
 
 const { Header, Content } = Layout;
 const { Text } = Typography;
@@ -56,7 +56,7 @@ export function Visualization(): JSX.Element {
   }, []);
   // fetch cluster list from api
   const getEtcdCluster = async () => {
-    axios.get('/apis/etcdclusters').then((resp) => {
+    http.get('/apis/etcdclusters').then((resp) => {
       if (resp.data.items.length) {
         setClusterList(resp.data.items);
         setClusterName(resp.data.items[0].metadata.name);
@@ -68,7 +68,7 @@ export function Visualization(): JSX.Element {
     setLoadingTree(true);
     if (clusterName.length) {
       setSelectKey([]);
-      axios.get(`/apis/etcd/${clusterName}`).then((res) => {
+      http.get(`/apis/etcd/${clusterName}`).then((res) => {
         setData(res.data.data);
         const tree = toTree(res.data.data);
         setTreeJson(tree);
@@ -79,7 +79,7 @@ export function Visualization(): JSX.Element {
   // init info
   const initEditor = useCallback(async () => {
     setIsLoading(true);
-    const res = await axios.get(
+    const res = await http.get(
       `/apis/etcd/${clusterName}?key=${selectKey
         .join('/')
         .replace('root', '')}`,

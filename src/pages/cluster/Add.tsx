@@ -34,7 +34,7 @@ import { PlusOutlined, MinusOutlined } from '@ant-design/icons';
 import http from 'src/utils/http';
 import { encode } from 'js-base64';
 import { useTranslation } from 'react-i18next';
-import { GenerateOwnerReferences } from 'src/utils/common';
+import { GenerateOwnerReferences, APIVersion } from 'src/utils/common';
 
 const { Header, Content } = Layout;
 const { Text } = Typography;
@@ -61,34 +61,50 @@ export function Add(): JSX.Element {
   const title = t('ImortCluster');
 
   const ensureSecret = async (values: any, clusterUID: string) => {
-    if (values.scheme === 'https') {
-      // init etcd secret
-      const secret: any = {
-        apiVersion: 'v1',
-        data: {
-          'ca.pem': encode(values.ca),
-          'client.pem': encode(values.clientCa),
-          'client-key.pem': encode(values.clientKey),
-        },
-        kind: 'Secret',
-        metadata: {
-          name: values.name,
-          namespace: 'kstone',
-          ownerReferences: GenerateOwnerReferences(values.name, clusterUID),
-        },
-        type: 'Opaque',
-      };
-      // post etcd secret
-      const resp = await http.post('/apis/secrets', secret);
-      if (resp.statusText !== 'Created' && resp.status !== 409) {
-        // handle error
-        message.error({
-          content: t('FailedToCreateSecret'),
-        });
-        sleep(2000);
-        return;
+    const secret: any = {
+      apiVersion: 'v1',
+      data: undefined,
+      kind: 'Secret',
+      metadata: {
+        name: values.name,
+        namespace: 'kstone',
+        ownerReferences: GenerateOwnerReferences(values.name, clusterUID),
+      },
+      type: 'Opaque',
+    };
+
+    // init secret for https
+    if (values.scheme === 'https' || values.authEnable) {
+      if (secret.data === undefined) {
+        secret.data = {};
       }
+      secret.data['ca.pem'] = encode(values.ca);
+      secret.data['client.pem'] = encode(values.clientCa);
+      secret.data['client-key.pem'] = encode(values.clientKey);
     }
+
+    // init secret for auth
+    if (values.user !== '' && values.password !== '' && values.authEnable) {
+      if (secret.data === undefined) {
+        secret.data = {};
+      }
+      secret.data['username'] = encode(values.user);
+      secret.data['password'] = encode(values.password);
+    }
+
+    if (secret.data !== undefined && (secret.data['ca.pem'] !== '' || secret.data['username'] !== '')) {
+       // post etcd secret
+       const resp = await http.post('/apis/secrets', secret);
+       if (resp.statusText !== 'Created' && resp.status !== 409) {
+         // handle error
+         message.error({
+           content: t('FailedToCreateSecret'),
+         });
+         sleep(2000);
+         return;
+       }
+    }
+
     window.location.href = '/cluster';
   };
 
@@ -114,7 +130,7 @@ export function Add(): JSX.Element {
     }
     // init cluster info
     const data = {
-      apiVersion: 'kstone.tkestack.io/v1alpha1',
+      apiVersion: APIVersion,
       kind: 'EtcdCluster',
       metadata: {
         annotations: {
@@ -200,6 +216,53 @@ export function Add(): JSX.Element {
               <Radio value="https">HTTPS</Radio>
               <Radio value="http">HTTP</Radio>
             </Radio.Group>
+          </Form.Item>
+          <Form.Item
+            noStyle
+            shouldUpdate={(prevValues, currentValues) =>
+              prevValues.scheme !== currentValues.scheme
+            }
+          >
+            {({ getFieldValue }) =>
+              getFieldValue('scheme') === 'http' ? (
+                <>
+                  <Form.Item
+                    name="authEnable"
+                    label={t('AuthEnable')}
+                    valuePropName="checked">
+                    <Switch />
+                  </Form.Item>
+                </>
+              ) : null
+            }
+
+          </Form.Item>
+          <Form.Item
+            noStyle
+            shouldUpdate={(prevValues, currentValues) =>
+              prevValues.authEnable !== currentValues.authEnable
+            }
+          >
+            {({ getFieldValue }) =>
+              getFieldValue('authEnable') ? (
+                <>
+                  <Form.Item
+                    name="user"
+                    label={t('User')}
+                    wrapperCol={{ span: 7 }}
+                  >
+                    <Input />
+                  </Form.Item>
+                  <Form.Item
+                    name="password"
+                    label={t('Password')}
+                    wrapperCol={{ span: 7 }}
+                  >
+                    <Input.Password></Input.Password>
+                  </Form.Item>
+                </>
+              ) : null
+            }
           </Form.Item>
           <Form.Item
             name="endpoint"
