@@ -98,5 +98,6 @@
   "PasswordStrengthMessage": "Password strength requires at least 8 characters in length and contains at least numbers, lowercase letters, uppercase letters, and special characters.",
   "SignIn": "Sign in",
   "SignOut": "Sign out",
-  "UserMessage": "Please input your username!"
+  "UserMessage": "Please input your username!",
+  "Memory": "Memory"
 }

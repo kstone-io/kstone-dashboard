@@ -30,6 +30,7 @@ import {
   Button,
   Tag,
   Select,
+  Space,
 } from 'antd';
 import { PlusOutlined, MinusOutlined } from '@ant-design/icons';
 import http from 'src/utils/http';
@@ -103,9 +104,17 @@ export function Create(): JSX.Element {
         env: envRequest,
         name: values.name,
         size: values.size,
-        totalCpu: values.totalCpu,
-        totalMem: values.totalMem,
         version: values.version,
+        resources: {
+          limits: {
+            cpu: values.cpuLimit.toString(),
+            memory: values.memoryLimit.toString() + "Mi",
+          },
+          requests: {
+            cpu: values.cpuRequest.toString(),
+            memory: values.memoryRequest.toString() + "Mi",
+          }
+        }
       },
       status: {
         phase: 'Init',
@@ -152,15 +161,33 @@ export function Create(): JSX.Element {
             diskSize: 30,
             diskType: 'ssd',
             version: Object.keys(versionMap)[0],
+            cpuLimit: 1,
+            cpuRequest: 1,
+            memoryLimit: 1024,
+            memoryRequest: 1024,
           }}
         >
           <Form.Item label={t('ClusterName')}>
-            <Form.Item name="name" noStyle>
+            <Form.Item 
+              name="name"
+              rules={[
+                {
+                  required: true,
+                },
+              ]}
+              noStyle>
               <Input></Input>
             </Form.Item>
           </Form.Item>
           <Form.Item label={t('ClusterDescription')}>
-            <Form.Item name="remark" noStyle>
+            <Form.Item
+              name="remark"
+              rules={[
+                {
+                  required: true,
+                },
+              ]}
+              noStyle>
               <Input></Input>
             </Form.Item>
           </Form.Item>
@@ -196,15 +223,53 @@ export function Create(): JSX.Element {
               <Radio value="http">HTTP</Radio>
             </Radio.Group>
           </Form.Item>
-          <Form.Item name="totalCpu" label={t('CPUCores')}>
-            <InputNumber />
+          <Form.Item label={t('CPU')}>
+            <Space>
+              <Form.Item 
+                name="cpuRequest"
+                rules={[
+                  {
+                    required: true,
+                  },
+                ]}
+                noStyle><InputNumber style={{ width: 150 }} addonBefore="request" min={0.5} prefix="request" name="cpuRequest"></InputNumber>
+              </Form.Item>
+              -
+              <Form.Item 
+                name="cpuLimit"
+                rules={[
+                  {
+                    required: true,
+                  },
+                ]}
+                noStyle><InputNumber style={{ width: 150 }} addonBefore="limit" min={0.5} prefix="limit" name="cpuLimit"></InputNumber>
+              </Form.Item>
+              {t('Core')}
+            </Space>
           </Form.Item>
-          <Form.Item
-            name="totalMem"
-            label={t('MemorySize')}
-            wrapperCol={{ span: 3 }}
-          >
-            <InputNumber addonAfter="GB" />
+          <Form.Item label={t('Memory')}>
+            <Space>
+              <Form.Item 
+                name="memoryRequest"
+                rules={[
+                  {
+                    required: true,
+                  },
+                ]}
+                noStyle><InputNumber style={{ width: 150 }} addonBefore="request" min={256} prefix="request" name="memoryRequest"></InputNumber>
+              </Form.Item>
+              -
+              <Form.Item 
+                name="memoryLimit"
+                rules={[
+                  {
+                    required: true,
+                  },
+                ]}
+                noStyle><InputNumber style={{ width: 150 }} addonBefore="limit" min={256} prefix="limit" name="memoryLimit"></InputNumber>
+              </Form.Item>
+              MB
+            </Space>
           </Form.Item>
           <Form.Item
             name="diskSize"
@@ -295,6 +360,12 @@ export function Create(): JSX.Element {
             name="description"
             label={t('Description')}
             wrapperCol={{ span: 17 }}
+            rules={[
+              {
+                required: true,
+                message: t('PleaseInput') + ' ' + t('Description'),
+              },
+            ]}
           >
             <TextArea
               placeholder={t('Description')}
@@ -307,7 +378,7 @@ export function Create(): JSX.Element {
             </Button>
           </Form.Item>
         </Form>
-      </Content>
-    </Layout>
+      </Content >
+    </Layout >
   );
 }
