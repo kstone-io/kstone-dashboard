@@ -114,7 +114,7 @@ export function Add(): JSX.Element {
   const onFinish = async (values: any) => {
     let certName = '';
     // handle https
-    if (values.scheme === 'https') {
+    if (values.scheme === 'https' || values.authEnable) {
       certName = `kstone/${values.name}`;
     }
     // transfer memberList to extClientURL
