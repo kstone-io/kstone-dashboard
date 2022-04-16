@@ -67,7 +67,7 @@ export function Add(): JSX.Element {
       kind: 'Secret',
       metadata: {
         name: values.name,
-        namespace: 'kstone',
+        // namespace: 'kstone',
         ownerReferences: GenerateOwnerReferences(values.name, clusterUID),
       },
       type: 'Opaque',
@@ -114,8 +114,8 @@ export function Add(): JSX.Element {
   const onFinish = async (values: any) => {
     let certName = '';
     // handle https
-    if (values.scheme === 'https') {
-      certName = `kstone/${values.name}`;
+    if (values.scheme === 'https' || values.authEnable) {
+      certName = `${values.name}`;
     }
     // transfer memberList to extClientURL
     let extClientURL = '';
@@ -138,7 +138,7 @@ export function Add(): JSX.Element {
           kubernetes: values.isKubernetes ? 'true' : 'false',
         },
         name: values.name,
-        namespace: 'kstone',
+        // namespace: 'kstone',
       },
       spec: {
         args: [],

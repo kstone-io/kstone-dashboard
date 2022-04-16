@@ -98,5 +98,6 @@
   "PasswordStrengthMessage": "密码强度要求长度至少8位，至少包含数字、小写字母、大写字母和特殊字符。",
   "SignIn": "登入",
   "SignOut": "登出",
-  "UserMessage": "请输入你的用户名！"
+  "UserMessage": "请输入你的用户名！",
+  "Memory": "内存"
 }
