@@ -30,10 +30,12 @@ import {
   Button,
   Tag,
   Select,
+  Space,
 } from 'antd';
 import { PlusOutlined, MinusOutlined } from '@ant-design/icons';
 import http from 'src/utils/http';
 import { useTranslation } from 'react-i18next';
+import { APIVersion } from 'src/utils/common';
 
 const { Header, Content } = Layout;
 const { Text } = Typography;
@@ -43,7 +45,7 @@ const MappingSymbol = '=';
 const GlobalConfig = 'etcd-version-global-config';
 // form style
 const formItemLayout = {
-  labelCol: { span: 3 },
+  labelCol: { span: 6 },
   wrapperCol: { span: 6 },
 };
 
@@ -82,7 +84,7 @@ export function Create(): JSX.Element {
     }
     // init cluster info
     const data: any = {
-      apiVersion: 'kstone.tkestack.io/v1alpha1',
+      apiVersion: APIVersion,
       kind: 'EtcdCluster',
       metadata: {
         annotations: {
@@ -98,13 +100,21 @@ export function Create(): JSX.Element {
         clusterType: 'kstone-etcd-operator',
         description: values.description,
         diskSize: values.diskSize,
-        diskType: values.diskType ? values.diskType : 'ssd',
+        diskType: values.diskType ? values.diskType : '',
         env: envRequest,
         name: values.name,
         size: values.size,
-        totalCpu: values.totalCpu,
-        totalMem: values.totalMem,
         version: values.version,
+        resources: {
+          limits: {
+            cpu: values.cpuLimit.toString(),
+            memory: values.memoryLimit.toString() + "Mi",
+          },
+          requests: {
+            cpu: values.cpuRequest.toString(),
+            memory: values.memoryRequest.toString() + "Mi",
+          }
+        }
       },
       status: {
         phase: 'Init',
@@ -149,17 +159,34 @@ export function Create(): JSX.Element {
             totalMem: 2,
             size: 3,
             diskSize: 30,
-            diskType: 'ssd',
             version: Object.keys(versionMap)[0],
+            cpuLimit: 1,
+            cpuRequest: 1,
+            memoryLimit: 1024,
+            memoryRequest: 1024,
           }}
         >
           <Form.Item label={t('ClusterName')}>
-            <Form.Item name="name" noStyle>
+            <Form.Item 
+              name="name"
+              rules={[
+                {
+                  required: true,
+                },
+              ]}
+              noStyle>
               <Input></Input>
             </Form.Item>
           </Form.Item>
           <Form.Item label={t('ClusterDescription')}>
-            <Form.Item name="remark" noStyle>
+            <Form.Item
+              name="remark"
+              rules={[
+                {
+                  required: true,
+                },
+              ]}
+              noStyle>
               <Input></Input>
             </Form.Item>
           </Form.Item>
@@ -195,15 +222,53 @@ export function Create(): JSX.Element {
               <Radio value="http">HTTP</Radio>
             </Radio.Group>
           </Form.Item>
-          <Form.Item name="totalCpu" label={t('CPUCores')}>
-            <InputNumber />
+          <Form.Item label={t('CPU')}>
+            <Space>
+              <Form.Item 
+                name="cpuRequest"
+                rules={[
+                  {
+                    required: true,
+                  },
+                ]}
+                noStyle><InputNumber style={{ width: 150 }} addonBefore="request" min={0.5} prefix="request" name="cpuRequest"></InputNumber>
+              </Form.Item>
+              -
+              <Form.Item 
+                name="cpuLimit"
+                rules={[
+                  {
+                    required: true,
+                  },
+                ]}
+                noStyle><InputNumber style={{ width: 150 }} addonBefore="limit" min={0.5} prefix="limit" name="cpuLimit"></InputNumber>
+              </Form.Item>
+              {t('Core')}
+            </Space>
           </Form.Item>
-          <Form.Item
-            name="totalMem"
-            label={t('MemorySize')}
-            wrapperCol={{ span: 3 }}
-          >
-            <InputNumber addonAfter="GB" />
+          <Form.Item label={t('Memory')}>
+            <Space>
+              <Form.Item 
+                name="memoryRequest"
+                rules={[
+                  {
+                    required: true,
+                  },
+                ]}
+                noStyle><InputNumber style={{ width: 150 }} addonBefore="request" min={256} prefix="request" name="memoryRequest"></InputNumber>
+              </Form.Item>
+              -
+              <Form.Item 
+                name="memoryLimit"
+                rules={[
+                  {
+                    required: true,
+                  },
+                ]}
+                noStyle><InputNumber style={{ width: 150 }} addonBefore="limit" min={256} prefix="limit" name="memoryLimit"></InputNumber>
+              </Form.Item>
+              MB
+            </Space>
           </Form.Item>
           <Form.Item
             name="diskSize"
@@ -227,7 +292,7 @@ export function Create(): JSX.Element {
             <List style={{ marginTop: '0px', paddingTop: '0px' }}>
               {envList.map((item, i) => {
                 return (
-                  <List.Item key={i}>
+                  <List.Item key={i} style={{ paddingTop: '0px' }}>
                     <Input
                       value={item.name}
                       onChange={(e) => {
@@ -294,6 +359,12 @@ export function Create(): JSX.Element {
             name="description"
             label={t('Description')}
             wrapperCol={{ span: 17 }}
+            rules={[
+              {
+                required: true,
+                message: t('PleaseInput') + ' ' + t('Description'),
+              },
+            ]}
           >
             <TextArea
               placeholder={t('Description')}
@@ -302,11 +373,11 @@ export function Create(): JSX.Element {
           </Form.Item>
           <Form.Item wrapperCol={{ span: 12 }}>
             <Button type="primary" htmlType="submit">
-              提交
+              {t('Submit')}
             </Button>
           </Form.Item>
         </Form>
-      </Content>
-    </Layout>
+      </Content >
+    </Layout >
   );
 }

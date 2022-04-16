@@ -34,6 +34,7 @@ import { PlusOutlined, MinusOutlined } from '@ant-design/icons';
 import http from 'src/utils/http';
 import { encode } from 'js-base64';
 import { useTranslation } from 'react-i18next';
+import { GenerateOwnerReferences, APIVersion } from 'src/utils/common';
 
 const { Header, Content } = Layout;
 const { Text } = Typography;
@@ -42,7 +43,7 @@ const { TextArea } = Input;
 const MappingSymbol = '->';
 // form style
 const formItemLayout = {
-  labelCol: { span: 3 },
+  labelCol: { span: 4 },
   wrapperCol: { span: 6 },
 };
 const sleep = (ms: any) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -59,39 +60,62 @@ export function Add(): JSX.Element {
   ]);
   const title = t('ImortCluster');
 
+  const ensureSecret = async (values: any, clusterUID: string) => {
+    const secret: any = {
+      apiVersion: 'v1',
+      data: undefined,
+      kind: 'Secret',
+      metadata: {
+        name: values.name,
+        // namespace: 'kstone',
+        ownerReferences: GenerateOwnerReferences(values.name, clusterUID),
+      },
+      type: 'Opaque',
+    };
+
+    // init secret for https
+    if (values.scheme === 'https' || values.authEnable) {
+      if (secret.data === undefined) {
+        secret.data = {};
+      }
+      secret.data['ca.pem'] = encode(values.ca);
+      secret.data['client.pem'] = encode(values.clientCa);
+      secret.data['client-key.pem'] = encode(values.clientKey);
+    }
+
+    // init secret for auth
+    if (values.user !== '' && values.password !== '' && values.authEnable) {
+      if (secret.data === undefined) {
+        secret.data = {};
+      }
+      secret.data['username'] = encode(values.user);
+      secret.data['password'] = encode(values.password);
+    }
+
+    if (secret.data !== undefined && (secret.data['ca.pem'] !== '' || secret.data['username'] !== '')) {
+       // post etcd secret
+       const resp = await http.post('/apis/secrets', secret);
+       if (resp.statusText !== 'Created' && resp.status !== 409) {
+         // handle error
+         message.error({
+           content: t('FailedToCreateSecret'),
+         });
+         sleep(2000);
+         return;
+       }
+    }
+
+    window.location.href = '/cluster';
+  };
+
   // get form
   const [form] = Form.useForm();
   // handle finish
   const onFinish = async (values: any) => {
     let certName = '';
     // handle https
-    if (values.scheme === 'https') {
-      certName = `kstone/${values.name}`;
-      // init etcd secret
-      const secret: any = {
-        apiVersion: 'v1',
-        data: {
-          'ca.pem': encode(values.ca),
-          'client.pem': encode(values.clientCa),
-          'client-key.pem': encode(values.clientKey),
-        },
-        kind: 'Secret',
-        metadata: {
-          name: values.name,
-          namespace: 'kstone',
-        },
-        type: 'Opaque',
-      };
-      // post etcd secret
-      const resp = await http.post('/apis/secrets', secret);
-      if (resp.statusText !== 'Created' && resp.status !== 409) {
-        // handle error
-        message.error({
-          content: t('FailedToCreateSecret'),
-        });
-        sleep(2000);
-        return;
-      }
+    if (values.scheme === 'https' || values.authEnable) {
+      certName = `${values.name}`;
     }
     // transfer memberList to extClientURL
     let extClientURL = '';
@@ -106,7 +130,7 @@ export function Add(): JSX.Element {
     }
     // init cluster info
     const data = {
-      apiVersion: 'kstone.tkestack.io/v1alpha1',
+      apiVersion: APIVersion,
       kind: 'EtcdCluster',
       metadata: {
         annotations: {
@@ -114,7 +138,7 @@ export function Add(): JSX.Element {
           kubernetes: values.isKubernetes ? 'true' : 'false',
         },
         name: values.name,
-        namespace: 'kstone',
+        // namespace: 'kstone',
       },
       spec: {
         args: [],
@@ -139,7 +163,7 @@ export function Add(): JSX.Element {
     // post cluster
     http.post('/apis/etcdclusters', data).then((resp) => {
       if (resp.statusText === 'Created') {
-        window.location.href = '/cluster';
+        ensureSecret(values, resp.data.metadata.uid);
       } else {
         // handle error
         message.error({
@@ -194,6 +218,53 @@ export function Add(): JSX.Element {
             </Radio.Group>
           </Form.Item>
           <Form.Item
+            noStyle
+            shouldUpdate={(prevValues, currentValues) =>
+              prevValues.scheme !== currentValues.scheme
+            }
+          >
+            {({ getFieldValue }) =>
+              getFieldValue('scheme') === 'http' ? (
+                <>
+                  <Form.Item
+                    name="authEnable"
+                    label={t('AuthEnable')}
+                    valuePropName="checked">
+                    <Switch />
+                  </Form.Item>
+                </>
+              ) : null
+            }
+
+          </Form.Item>
+          <Form.Item
+            noStyle
+            shouldUpdate={(prevValues, currentValues) =>
+              prevValues.authEnable !== currentValues.authEnable
+            }
+          >
+            {({ getFieldValue }) =>
+              getFieldValue('authEnable') ? (
+                <>
+                  <Form.Item
+                    name="user"
+                    label={t('User')}
+                    wrapperCol={{ span: 7 }}
+                  >
+                    <Input />
+                  </Form.Item>
+                  <Form.Item
+                    name="password"
+                    label={t('Password')}
+                    wrapperCol={{ span: 7 }}
+                  >
+                    <Input.Password></Input.Password>
+                  </Form.Item>
+                </>
+              ) : null
+            }
+          </Form.Item>
+          <Form.Item
             name="endpoint"
             label={t('Address')}
             wrapperCol={{ span: 7 }}
@@ -234,7 +305,7 @@ export function Add(): JSX.Element {
             <List style={{ marginTop: '0px', paddingTop: '0px' }}>
               {memberList.map((item, i) => {
                 return (
-                  <List.Item key={i}>
+                  <List.Item key={i} style={{ paddingTop: '0px' }}>
                     <Input
                       value={item.key}
                       onChange={(e) => {
