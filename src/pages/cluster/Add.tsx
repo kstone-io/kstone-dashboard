@@ -115,7 +115,7 @@ export function Add(): JSX.Element {
     let certName = '';
     // handle https
     if (values.scheme === 'https' || values.authEnable) {
-      certName = `kstone/${values.name}`;
+      certName = `${values.name}`;
     }
     // transfer memberList to extClientURL
     let extClientURL = '';
