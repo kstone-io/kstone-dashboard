@@ -145,6 +145,7 @@ export const ClusterFeatureModal = ({
       kind: 'Secret',
       metadata: {
         name: `cos-${data.metadata.name}`,
+        namespace: 'kstone',
         ownerReferences: GenerateOwnerReferences(data.metadata.name, data.metadata.uid),
       },
       type: 'Opaque',

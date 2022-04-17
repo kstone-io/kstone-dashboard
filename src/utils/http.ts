@@ -19,7 +19,6 @@
 import axios, { AxiosRequestConfig, AxiosResponse } from 'axios';
 import { message } from 'antd';
 import i18n from 'src/languages/i18n';
-import cookies from './cookies';
 
 const showStatus = (status: number) => {
   let message = '';
@@ -84,13 +83,7 @@ const HTTP = axios.create({
 // 请求拦截器
 HTTP.interceptors.request.use(
   (config: AxiosRequestConfig) => {
-    const cnf = config as any;
-    // 为所有的请求设置token
-    const token = cookies.get("token");
-    if (token) {
-      cnf.headers["kstone-api-jwt"] = token;
-    }
-    return cnf;
+    return config;
   },
   (error) => {
     // 错误抛到业务代码
@@ -113,12 +106,6 @@ HTTP.interceptors.response.use(
         response.data = { msg };
       } else {
         response.data.msg = msg;
-      }
-      if (status === 401) {
-        debugger;
-        if (window.location.href.indexOf('login') === -1) {
-          window.location.href = '/login';
-        }
       }
       message.error({ content: response.data.message || response.data.msg });
     } else {

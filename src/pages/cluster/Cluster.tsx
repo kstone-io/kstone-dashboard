@@ -118,13 +118,13 @@ export function Cluster(): JSX.Element {
     {
       key: 'spec',
       title: t('Configurations'),
-      render: (cluster: any) => {
-        if (cluster.spec.resources?.limits) {
-          return <p>
-            {cluster.spec.resources?.limits?.cpu}{t('Core')} {cluster.spec.resources?.limits?.memory}
-          </p>;
-        }
-      },
+      render: (cluster: any) => (
+        <>
+          <p>
+            {cluster.spec.totalCpu}{t('Core')} {cluster.spec.totalMem}GB
+          </p>
+        </>
+      ),
     },
     {
       key: 'disk',
