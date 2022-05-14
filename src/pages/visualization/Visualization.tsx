@@ -115,7 +115,7 @@ export function Visualization(): JSX.Element {
       }
       const parentPath = menu.slice(0, len).join('/');
       if (parentPath.length) {
-        obj[`${parentPath}/${menu[len]}`] = `${parentPath}/${menu[len]}`;
+        obj[`${parentPath}/${menu[len]}`] = {};
       } else {
         obj[`${menu[len]}`] = `${menu[len]}`;
       }

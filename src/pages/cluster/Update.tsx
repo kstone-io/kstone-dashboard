@@ -30,12 +30,14 @@ import {
   Button,
   Tag,
   Spin,
+  Space
 } from 'antd';
 import { PlusOutlined, MinusOutlined } from '@ant-design/icons';
 import { useParams } from 'react-router';
 import http from 'src/utils/http';
 import { encode, decode } from 'js-base64';
 import { useTranslation } from 'react-i18next';
+import { GenerateMB } from 'src/utils/common';
 
 const { Header, Content } = Layout;
 const { Text } = Typography;
@@ -146,6 +148,7 @@ export function Update(): JSX.Element {
       ? 'true'
       : 'false';
     cluster.metadata.annotations.remark = values.remark;
+    debugger;
     cluster.spec = {
       args: [],
       clusterType: cluster.spec?.clusterType,
@@ -155,9 +158,18 @@ export function Update(): JSX.Element {
       env: envRequest,
       name: values.name,
       size: values.size,
-      totalCpu: values.totalCpu,
-      totalMem: values.totalMem,
       version: cluster.spec.version,
+      resources: {
+        limits: {
+          cpu: values.cpuLimit.toString(),
+          memory: values.memoryLimit.toString() + "Mi",
+        },
+        requests: {
+          cpu: values.cpuRequest ? values.cpuRequest.toString() : values.cpuLimit.toString(),
+          memory: values.memoryRequest ? values.memoryRequest.toString() + "Mi" : values.memoryLimit.toString() + "Mi",
+        }
+      },
+      storageBackend: values.storageBackend
     };
     // put cluster info
     http
@@ -179,6 +191,13 @@ export function Update(): JSX.Element {
     setTitle(t('EditCluster'));
     // get cluster info
     await http.get(`/apis/etcdclusters/${params.name}`).then((resp) => {
+      if (resp.data.spec?.resources?.limits?.memory) {
+        resp.data.spec.resources.limits.memory = GenerateMB(resp.data.spec.resources.limits.memory);
+      }
+      if (resp.data.spec?.resources?.requests?.memory) {
+        resp.data.spec.resources.requests.memory = GenerateMB(resp.data.spec.resources.requests.memory);
+      }
+      debugger;
       setCluster(resp.data);
       const cluster: any = resp.data;
       // get certName
@@ -198,8 +217,12 @@ export function Update(): JSX.Element {
             endpoint: cluster.metadata.annotations.importedAddr.split('/')[2],
             isKubernetes:
               cluster.metadata.annotations.kubernetes === 'true' ? true : false,
-            totalCpu: cluster.spec.totalCpu,
-            totalMem: cluster.spec.totalMem,
+            totalCpu: cluster.spec.resources.limits.cpu,
+            totalMem: cluster.spec.resources.limits.memory,
+            cpuLimit: cluster.spec.resources.limits.cpu,
+            memoryLimit: cluster.spec.resources.limits.memory,
+            cpuRequest: cluster.spec.resources.requests.cpu,
+            memoryRequest: cluster.spec.resources.requests.memory,
             diskType: cluster.spec.diskType,
             diskSize: cluster.spec.diskSize,
             size: cluster.spec.size,
@@ -208,6 +231,7 @@ export function Update(): JSX.Element {
             clientCa: decode(secret.data['client.pem']),
             clientKey: decode(secret.data['client-key.pem']),
             version: cluster.spec.version,
+            storageBackend: cluster.spec.storageBackend
           });
           // init envList
           setEnvList(cluster.spec.env ? cluster.spec.env : []);
@@ -237,8 +261,12 @@ export function Update(): JSX.Element {
           endpoint: cluster.metadata.annotations.importedAddr.split('/')[2],
           isKubernetes:
             cluster.metadata.annotations.kubernetes === 'true' ? true : false,
-          totalCpu: cluster.spec.totalCpu,
-          totalMem: cluster.spec.totalMem,
+          totalCpu: cluster.spec.resources.limits.cpu,
+          totalMem: cluster.spec.resources.requests.memory,
+          cpuLimit: cluster.spec.resources.limits.cpu,
+          memoryLimit: cluster.spec.resources.limits.memory,
+          cpuRequest: cluster.spec.resources.requests.cpu,
+          memoryRequest: cluster.spec.resources.requests.memory,
           diskType: cluster.spec.diskType,
           diskSize: cluster.spec.diskSize,
           size: cluster.spec.size,
@@ -247,6 +275,7 @@ export function Update(): JSX.Element {
           clientCa: undefined,
           clientKey: undefined,
           version: cluster.spec.version,
+          storageBackend: cluster.spec.storageBackend
         });
         // init envList
         setEnvList(cluster.spec.env);
@@ -334,16 +363,73 @@ export function Update(): JSX.Element {
                 disabled={cluster.spec?.clusterType !== ClusterTypeImported}
               />
             </Form.Item>
-            <Form.Item name="totalCpu" label={t('CPUCores')}>
-              <InputNumber />
-            </Form.Item>
-            <Form.Item
-              name="totalMem"
-              label={t('MemorySize')}
-              wrapperCol={{ span: 3 }}
-            >
-              <InputNumber addonAfter="GB" />
-            </Form.Item>
+            {
+              cluster?.spec?.clusterType === ClusterTypeImported ? (
+                <>
+                  <Form.Item name="cpuLimit" label={t('CPUCores')}>
+                    <InputNumber />
+                  </Form.Item>
+                  <Form.Item
+                    name="memoryLimit"
+                    label={t('MemorySize')}
+                    wrapperCol={{ span: 3 }}
+                  >
+                    <InputNumber addonAfter="MB" />
+                  </Form.Item>
+                </>
+              ) : (
+                <>
+                  <Form.Item label={t('CPU')}>
+                    <Space>
+                      <Form.Item
+                        name="cpuRequest"
+                        rules={[
+                          {
+                            required: true,
+                          },
+                        ]}
+                        noStyle><InputNumber style={{ width: 150 }} addonBefore="request" min={0.5} prefix="request" name="cpuRequest"></InputNumber>
+                      </Form.Item>
+                      -
+                      <Form.Item
+                        name="cpuLimit"
+                        rules={[
+                          {
+                            required: true,
+                          },
+                        ]}
+                        noStyle><InputNumber style={{ width: 150 }} addonBefore="limit" min={0.5} prefix="limit" name="cpuLimit"></InputNumber>
+                      </Form.Item>
+                      {t('Core')}
+                    </Space>
+                  </Form.Item>
+                  <Form.Item label={t('Memory')}>
+                    <Space>
+                      <Form.Item
+                        name="memoryRequest"
+                        rules={[
+                          {
+                            required: true,
+                          },
+                        ]}
+                        noStyle><InputNumber style={{ width: 150 }} addonBefore="request" min={256} prefix="request" name="memoryRequest"></InputNumber>
+                      </Form.Item>
+                      -
+                      <Form.Item
+                        name="memoryLimit"
+                        rules={[
+                          {
+                            required: true,
+                          },
+                        ]}
+                        noStyle><InputNumber style={{ width: 150 }} addonBefore="limit" min={256} prefix="limit" name="memoryLimit"></InputNumber>
+                      </Form.Item>
+                      MB
+                    </Space>
+                  </Form.Item>
+                </>
+              )
+            }
             <Form.Item
               name="diskType"
               label={t('DiskType')}
@@ -367,6 +453,16 @@ export function Update(): JSX.Element {
               wrapperCol={{ span: 3 }}
             >
               <InputNumber addonAfter={t('Node')} />
+            </Form.Item>
+            <Form.Item 
+              name="storageBackend"
+              label={t('StorageBackend')}
+              hidden={cluster.spec?.clusterType !== ClusterTypeImported}
+            >
+              <Radio.Group>
+                <Radio value="v2">v2</Radio>
+                <Radio value="v3">v3</Radio>
+              </Radio.Group>
             </Form.Item>
             <Form.Item
               name="env"
@@ -571,6 +667,12 @@ export function Update(): JSX.Element {
               name="description"
               label={t('Description')}
               wrapperCol={{ span: 17 }}
+              rules={[
+                {
+                  required: true,
+                  message: t('PleaseInput') + ' ' + t('Description'),
+                },
+              ]}
             >
               <TextArea
                 placeholder={t('Description')}
