@@ -99,5 +99,6 @@
   "SignIn": "登入",
   "SignOut": "登出",
   "UserMessage": "请输入你的用户名！",
-  "Memory": "内存"
+  "Memory": "内存",
+  "StorageBackend": "存储版本"
 }
