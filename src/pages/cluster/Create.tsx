@@ -114,7 +114,8 @@ export function Create(): JSX.Element {
             cpu: values.cpuRequest.toString(),
             memory: values.memoryRequest.toString() + "Mi",
           }
-        }
+        },
+        storageBackend: "v3"
       },
       status: {
         phase: 'Init',

@@ -100,5 +100,16 @@ export function GenerateOwnerReferences(etcdName: string, uid: string): any {
   ];
 }
 
+// GenerateMB generate memoryReuqest, memorylimit by memory
+export function GenerateMB(memory: string): any {
+  const e = ['M', 'G', 'T'];
+  for (let i = 0; i < e.length; i++) {
+    if (memory.indexOf(e[i]) > -1) {
+      return parseInt(memory.split(e[i])[0]) * Math.pow(2, i * 10);
+    }
+  }
+  return memory;
+}
+
 // APIVersion
 export const APIVersion = 'kstone.tkestack.io/v1alpha2';
