@@ -80,12 +80,18 @@ export function Backup(): JSX.Element {
   const getEtcdCluster = useCallback(async () => {
     setIsLoading(true);
     http.get('/apis/etcdclusters').then((resp) => {
-      if (resp.data.items.length) {
-        setClusterList(resp.data.items);
-        setClusterName(resp.data.items[0].metadata.name);
-        updateBackupInfo(resp.data.items[0].metadata.name, resp.data.items);
-        setIsLoading(false);
+      const backupList: any = [];
+      for (const item of resp.data.items) {
+        if (item?.metadata?.labels?.backup === 'true') {
+          backupList.push(item);
+        }
       }
+      if (backupList.length > 0) {
+        setClusterList(backupList);
+        setClusterName(backupList[0].metadata.name);
+        updateBackupInfo(backupList[0].metadata.name, backupList);
+      }
+      setIsLoading(false);
     });
   }, []);
 
@@ -109,7 +115,7 @@ export function Backup(): JSX.Element {
           setBackupInfo(undefined);
         } else {
           http.get(`/apis/backup/${clusterName}`).then((resp) => {
-            let result = resp.data;
+            let result = resp?.data;
             if (result === undefined) {
               result = [];
             }
