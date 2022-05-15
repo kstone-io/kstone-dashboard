@@ -42,14 +42,10 @@ export const ClusterFeatureModal = ({
   close: any;
 }): JSX.Element => {
   const [isLoading, setIsLoading] = useState(false);
-  const [backupIntervalInSecond, setBackupIntervalInSecond] = useState(3600);
-  const [maxBackups, setMaxBackups] = useState(72);
-  const [timeoutInSecond, setTimeoutInSecond] = useState(600);
-  const [secretId, setSecretId] = useState('');
-  const [secretKey, setSecretKey] = useState('');
-  const [path, setPath] = useState('');
   const { t } = useTranslation();
   const [featureMap, setFeatureMap] = useState({} as any);
+
+  const [form] = Form.useForm();
 
   const generateFeatureAnnotation = (): string => {
     let result = '';
@@ -78,14 +74,14 @@ export const ClusterFeatureModal = ({
               data?.metadata?.annotations?.backup ?? '{}',
             );
             const res = await http.get(`/apis/secrets/cos-${data.metadata.name}`);
-            setBackupIntervalInSecond(
-              backupValue?.backupPolicy?.backupIntervalInSecond,
-            );
-            setMaxBackups(backupValue?.backupPolicy?.maxBackups);
-            setTimeoutInSecond(backupValue?.backupPolicy?.timeoutInSecond);
-            setSecretId(decode(res?.data?.data['secret-id'] ?? ''));
-            setSecretKey(decode(res?.data?.data['secret-key'] ?? ''));
-            setPath(backupValue?.cos?.path);
+            form.setFieldsValue({
+              backupIntervalInSecond: backupValue?.backupPolicy?.backupIntervalInSecond,
+              maxBackups: backupValue?.backupPolicy?.maxBackups,
+              timeoutInSecond: backupValue?.backupPolicy?.timeoutInSecond,
+              secretId: decode(res?.data?.data['secret-id'] ?? ''),
+              secretKey: decode(res?.data?.data['secret-key'] ?? ''),
+              path: backupValue?.cos?.path
+            });
           }
           setIsLoading(false);
         }
@@ -93,18 +89,18 @@ export const ClusterFeatureModal = ({
     });
   }, [data]);
   // handle finish
-  const onFinish = async () => {
+  const onFinish = (values: any) => {
     const backupInfo = {
-      backupIntervalInSecond: backupIntervalInSecond,
-      maxBackups: maxBackups,
-      timeoutInSecond: timeoutInSecond,
-      secretId: secretId,
-      secretKey: secretKey,
-      path: path,
+      backupIntervalInSecond: values.backupIntervalInSecond,
+      maxBackups: values.maxBackups,
+      timeoutInSecond: values.timeoutInSecond,
+      secretId: values.secretId,
+      secretKey: values.secretKey,
+      path: values.path,
     };
 
-    await updateCluster(backupInfo);
-    await createSecret(backupInfo);
+    updateCluster(backupInfo);
+    createSecret(backupInfo);
     close();
   };
   // update feature gates setting
@@ -168,94 +164,115 @@ export const ClusterFeatureModal = ({
       visible={visible}
       title={t('ClusterFeature')}
       onCancel={close}
-      onOk={onFinish}
+      okButtonProps={{ htmlType: 'submit', form: 'form' }}
     >
-      <Spin spinning={isLoading}>
-        <Card title={t('FeatureGates')}>
-          <Form name="form" layout="inline">
-            <Row gutter={1}>
-              {
-                Object.keys(featureMap).sort().map((feature: string) => {
-                  console.log(feature);
-                  return <Col span={8}>
-                    <Form.Item style={{ textTransform: 'capitalize' }} label={feature}>
-                      <Switch
-                        key={feature}
-                        checked={featureMap[feature]}
-                        onChange={(value: boolean) => {
-                          featureMap[feature] = value;
-                          setFeatureMap({
-                            ...featureMap
-                          });
-                        }}
-                      />
-                    </Form.Item>
-                  </Col>;
-                })
-              }
-            </Row>
-          </Form>
-        </Card>
-        {featureMap['backup'] ? (
-          <Card
-            title={t('BackupParameterSettings')}
-            style={{ marginTop: '10px' }}
-          >
-            <Form name="backup" {...formItemLayout}>
-              <Form.Item label="BackupIntervalInSecond" required>
-                <InputNumber
-                  min={0}
-                  value={backupIntervalInSecond}
-                  onChange={(e: any) =>
-                    setBackupIntervalInSecond(e)
-                  }
-                />
-              </Form.Item>
-              <Form.Item label="MaxBackups" required>
-                <InputNumber
-                  min={0}
-                  value={maxBackups}
-                  onChange={(e: any) => setMaxBackups(e)}
-                />
-              </Form.Item>
-              <Form.Item label="TimeoutInSecond" required>
-                <InputNumber
-                  min={0}
-                  value={timeoutInSecond}
-                  onChange={(e: any) => setTimeoutInSecond(e)}
-                />
-              </Form.Item>
-              <Form.Item label="SecretId" required>
-                <Input
-                  placeholder={t('PleaseInput')}
-                  autoComplete="off"
-                  spellCheck={false}
-                  value={secretId}
-                  onChange={(e: any) => setSecretId(e.target.value)}
-                />
-              </Form.Item>
-              <Form.Item label="SecretKey" required>
-                <Input
-                  placeholder={t('PleaseInput')}
-                  autoComplete="off"
-                  spellCheck={false}
-                  value={secretKey}
-                  onChange={(e: any) => setSecretKey(e.target.value)}
-                />
-              </Form.Item>
-              <Form.Item label="Path" required>
-                <Input
-                  placeholder={t('PleaseInput')}
-                  autoComplete="off"
-                  spellCheck={false}
-                  value={path}
-                  onChange={(e: any) => setPath(e.target.value)}
-                />
-              </Form.Item>
+      <Form id="form" name="form" onFinish={onFinish} form={form} initialValues={{
+        backupIntervalInSecond: 3600,
+        maxBackups: 72,
+        timeoutInSecond: 600,
+      }}>
+        <Spin spinning={isLoading}>
+          <Card title={t('FeatureGates')}>
+            <Form layout="inline">
+              <Row gutter={1}>
+                {
+                  Object.keys(featureMap).sort().map((feature: string) => {
+                    console.log(feature);
+                    return <Col span={8}>
+                      <Form.Item style={{ textTransform: 'capitalize' }} label={feature}>
+                        <Switch
+                          key={feature}
+                          checked={featureMap[feature]}
+                          onChange={(value: boolean) => {
+                            featureMap[feature] = value;
+                            setFeatureMap({
+                              ...featureMap
+                            });
+                          }}
+                        />
+                      </Form.Item>
+                    </Col>;
+                  })
+                }
+              </Row>
             </Form>
           </Card>
-        ) : null}
-      </Spin>
+          {featureMap['backup'] ? (
+            <Card
+              title={t('BackupParameterSettings')}
+              style={{ marginTop: '10px' }}
+            >
+              {/* <Form name="backup" {...formItemLayout}> */}
+              <Form.Item name="backupIntervalInSecond" label="BackupIntervalInSecond" required {...formItemLayout}>
+                <InputNumber
+                  min={0}
+                />
+              </Form.Item>
+              <Form.Item name="maxBackups" label="MaxBackups" required {...formItemLayout}>
+                <InputNumber
+                  min={0}
+                />
+              </Form.Item>
+              <Form.Item name="timeoutInSecond" label="TimeoutInSecond" required {...formItemLayout}>
+                <InputNumber
+                  min={0}
+                />
+              </Form.Item>
+              <Form.Item
+                name="secretId"
+                label="SecretId"
+                required
+                {...formItemLayout}
+                rules={[
+                  {
+                    required: true,
+                    message: t('PleaseInput')
+                  },
+                ]}>
+                <Input
+                  placeholder={t('PleaseInput')}
+                  autoComplete="off"
+                  spellCheck={false}
+                />
+              </Form.Item>
+              <Form.Item
+                name="secretKey"
+                label="SecretKey"
+                required
+                {...formItemLayout}
+                rules={[
+                  {
+                    required: true,
+                    message: t('PleaseInput')
+                  },
+                ]}>
+                <Input
+                  placeholder={t('PleaseInput')}
+                  autoComplete="off"
+                  spellCheck={false}
+                />
+              </Form.Item>
+              <Form.Item
+                name="path"
+                label="Path"
+                required
+                {...formItemLayout}
+                rules={[
+                  {
+                    required: true,
+                    message: t('PleaseInput')
+                  },
+                ]}>
+                <Input
+                  placeholder={t('PleaseInput')}
+                  autoComplete="off"
+                  spellCheck={false}
+                />
+              </Form.Item>
+            </Card>
+          ) : null}
+        </Spin>
+      </Form>
     </Modal>
   );
 };
