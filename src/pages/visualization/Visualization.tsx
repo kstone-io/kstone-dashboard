@@ -79,6 +79,7 @@ export function Visualization(): JSX.Element {
   // init info
   const initEditor = useCallback(async () => {
     setIsLoading(true);
+    debugger;
     const res = await http.get(
       `/apis/etcd/${clusterName}?key=${selectKey
         .join('/')
@@ -115,18 +116,24 @@ export function Visualization(): JSX.Element {
       }
       const parentPath = menu.slice(0, len).join('/');
       if (parentPath.length) {
-        obj[`${parentPath}/${menu[len]}`] = {};
+        // obj[`${parentPath}/${menu[len]}`] = {};
+        obj[`${parentPath}/${menu[len]}`] = `${parentPath}/${menu[len]}`;
       } else {
         obj[`${menu[len]}`] = `${menu[len]}`;
       }
     }
     // check data
-    function checkData(tree: any) {
+    function checkData(tree: any, root: string) {
       return Object.keys(tree).map((value) => {
         const children: any =
-          typeof tree[value] === 'string' ? undefined : checkData(tree[value]);
+          typeof tree[value] === 'string' ? undefined : checkData(tree[value], value);
         const v = value.split('/');
         const currentKey = value === '/' ? '/' : v[v.length - 1];
+        if (typeof root === 'string') {
+          if (root[0] === '/' && value[0] !== '/') {
+            value = `/${value}`;
+          }
+        }
         const target = {
           value: currentKey,
           title: currentKey,
@@ -140,7 +147,7 @@ export function Visualization(): JSX.Element {
         return target;
       });
     }
-    return checkData(tree);
+    return checkData(tree, "");
   }
 
   useEffect(() => {
