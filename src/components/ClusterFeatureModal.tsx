@@ -87,7 +87,7 @@ export const ClusterFeatureModal = ({
         }
       })();
     });
-  }, [data]);
+  }, [data, form]);
   // handle finish
   const onFinish = (values: any) => {
     const backupInfo = {
