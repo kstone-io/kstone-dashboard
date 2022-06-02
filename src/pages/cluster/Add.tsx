@@ -129,6 +129,10 @@ export function Add(): JSX.Element {
       extClientURL = extClientURL.substr(0, extClientURL.length - 1);
     }
     // init cluster info
+    const cpuLimit = values.totalCpu;
+    const cpuRequest = values.totalCpu;
+    const memoryLimit = values.totalMem;
+    const memoryRequest = values.totalMem;
     const data = {
       apiVersion: APIVersion,
       kind: 'EtcdCluster',
@@ -152,6 +156,17 @@ export function Add(): JSX.Element {
         totalCpu: values.totalCpu,
         totalMem: values.totalMem,
         version: '',
+        resources: {
+          limits: {
+            cpu: cpuLimit.toString(),
+            memory: memoryLimit.toString() + "Mi",
+          },
+          requests: {
+            cpu: cpuRequest.toString(),
+            memory: memoryRequest.toString() + "Mi",
+          }
+        },
+        storageBackend: values.storageBackend,
       },
     } as any;
     if (extClientURL !== '') {
@@ -279,7 +294,7 @@ export function Add(): JSX.Element {
             label={t('MemorySize')}
             wrapperCol={{ span: 3 }}
           >
-            <InputNumber addonAfter="GB" />
+            <InputNumber addonAfter="MB" />
           </Form.Item>
           <Form.Item name="diskType" label={t('DiskType')}>
             <Radio.Group>
@@ -300,6 +315,12 @@ export function Add(): JSX.Element {
             wrapperCol={{ span: 3 }}
           >
             <InputNumber addonAfter={t('Node')} />
+          </Form.Item>
+          <Form.Item name="storageBackend" label={t('StorageBackend')}>
+            <Radio.Group>
+              <Radio value="v2">v2</Radio>
+              <Radio value="v3">v3</Radio>
+            </Radio.Group>
           </Form.Item>
           <Form.Item label={t('ClusterNodeMapping')} wrapperCol={{ span: 12 }}>
             <List style={{ marginTop: '0px', paddingTop: '0px' }}>
@@ -409,6 +430,12 @@ export function Add(): JSX.Element {
             name="description"
             label={t('Description')}
             wrapperCol={{ span: 17 }}
+            rules={[
+              {
+                required: true,
+                message: t('PleaseInput') + ' ' + t('Description'),
+              },
+            ]}
           >
             <TextArea
               placeholder={t('Description')}

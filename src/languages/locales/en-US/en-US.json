@@ -99,5 +99,6 @@
   "SignIn": "Sign in",
   "SignOut": "Sign out",
   "UserMessage": "Please input your username!",
-  "Memory": "Memory"
+  "Memory": "Memory",
+  "StorageBackend": "Storage Backend"
 }
